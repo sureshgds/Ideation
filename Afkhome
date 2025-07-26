@@ -1,0 +1,3974 @@
+import * as React from 'react';
+//import styles from './AfkHome.module.scss';
+import type { IAfkHomeProps } from './IAfkHomeProps';
+import { SPHttpClient } from '@microsoft/sp-http';
+//import { escape } from '@microsoft/sp-lodash-subset';
+import "./../assets/css/afstyle.css";
+//import "./../assets/js/bootstrap.bundle.min.js";
+require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
+require("../../../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js");
+// import Blockquoteicon from './../assets/img/svg/blockquote-icon.png';
+import ReactTooltip from "react-tooltip";
+import Downloadicon from "./../assets/img/svg/download-icon.png";
+//import Voteicon from "./../assets/img/svg/vote-icon.png";
+// import Votegreenicon from "./../assets/img/svg/vote-green-icon.svg";
+// import HomeBanner09 from "./../assets/img/hbanner09.jpg";
+// import ProfileImg07 from "./../assets/img/profile-img07.jpg";
+// import ProfileImg08 from "./../assets/img/profile-img08.jpg";
+//import Implementedthumbsicon from "./../assets/img/svg/implemented-thumbs.svg";
+//import ProfileImg02 from "./../assets/img/profile-img.jpg";
+//import ProfileImg03 from "./../assets/img/profile-img03.jpg";
+//import ProfileImg05 from "./../assets/img/profile-img05.jpg";
+//import ProfileImg14 from "./../assets/img/profile-img14.jpg";
+// import Videothumbnail from "./../assets/img/video-thumbnail.jpg";
+
+import Editicon from "./../assets/img/svg/edit-icon.png";
+import Globeicon from "./../assets/img/svg/globe-icon.png";
+//import Voteicon from "./../assets/img/svg/vote-icon.png";
+import Commenticon from "./../assets/img/svg/comment-icon.png";
+import Commentreplyicon from "./../assets/img/svg/comment-reply-icon.png";
+import Replyellipsesicon from "./../assets/img/svg/ellipses-reply.png";
+import Shareicon from "./../assets/img/svg/share-icon.png";
+// import Playicon from "./../assets/img/svg/play-white-icon.png";
+import Sharecopylinkicon from "./../assets/img/svg/share-copylink-icon.png";
+import Sharesenddirectlinkicon from "./../assets/img/svg/share-send-directlink-icon.png";
+import { IdeationAPIServices } from '../../../ideationAPIservice/ideationAPI';
+import { IAfkHomeStates } from './IAfkHomeStates';
+import { DefaultButton, Dialog, DialogFooter, DialogType, TextField } from '@fluentui/react';
+import MIe02 from "./../assets/img/svg/modal/cancel-clipboard.png";
+import MIe01 from "./../assets/img/svg/modal/submitted-thumbs.png";
+import Bookmarkiconwhite from "./../assets/img/svg/bookmark-icon-filled-white.png";
+import { Web } from 'sp-pnp-js';
+import * as CryptoJS from 'crypto-js';
+import DummyProfileimg from "./../assets/img/profile-img13.jpg";
+import hbanner10 from "./../assets/img/hbanner10.png";
+import ReactPlayer from 'react-player';
+//import ProfileImg06 from "./../assets/img/profile-img06.jpg";
+// import en from "./../assets/lang/en.json";
+// import ar from './../assets/lang/ar.json';
+
+import deletecomment from "./../assets/img/svg/comment-delete.png";
+import editcomment from "./../assets/img/svg/comment-edit.png";
+import reportcomment from "./../assets/img/svg/edit-icon-fill.png";
+
+// interface Attachment {
+//   imageUrl: string;
+//   IdeaID: number;
+//   pdfUrl: string;
+//   videoUrl: string;
+// }
+interface profileAttachment {
+  imageUrl: string;
+  IdeaID: number;
+}
+
+interface userDesignation {
+  designation: string;
+  Ideaowner: number;
+  name: string;
+  arname: string;
+
+}
+
+const GROUP_NAME = "Ideation Admin";
+// import NoDataicon from "./../assets/img/no_data.png";
+//import Voteicon from "./../assets/img/svg/vote-icon.png";
+export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStates, {}> {
+  private IdeationServices: IdeationAPIServices;
+  loggedInUser: any;
+  userImageUrl: any;
+  searchText: any;
+  // reportIdeaId:any;
+  // reportCommentId:any;
+  globalClass = "global-en";
+  langCode: any = 1033;
+  currentCommentId: any = 0;
+  commentdatalist: any;
+  isCommentMoreTwo: any;
+  initialComments: any;
+  isLoadMore: any = true;
+  constructor(props: IAfkHomeProps, state: IAfkHomeStates) {
+    super(props);
+    this.IdeationServices = new IdeationAPIServices();
+
+    this.state = {
+      isSuccess: false,
+      error: '',
+      isInGroup: false,
+      isLoader: true,
+      isSuccessDialogVisible: false,
+      isDialogVisible: false,
+      successMessageDesciption: "",
+      successMessageTitle: "",
+      errorDesciption: "",
+      errorTitle: "",
+      allIdeaList: [],
+      imageList: [],
+      // designationList:[],
+      token: "",
+      comment: "",
+      commentList: [],
+      isCommentShow: {},
+      isCommentLoadMore: false,
+      allCommentList: [],
+      editID: 0,
+      ideaID: "",
+      startnum: 0,
+      limit: 5,
+      filterName: "Recent",
+      isBookmarkModalOpen: false,
+      replyComment: "",
+      replyCommentList: [],
+      allReplyCommentList: [],
+      isReplyCommentShow: false,
+      replyStage1Comment: '',
+      replyStage1CommentList: [],
+      reportIdeaId: 0,
+      reportCommentId: 0,
+      stage1CommentReportDialog: false,
+      stage2CommentReportDialog: false,
+      reportRepliesId: 0,
+      editComment: '',
+      isReplyShowtextBox: false,
+      isReply2ShowtextBox: false,
+      ReplyCommenteditID: 0,
+      editReplyComment: '',
+      ideaReply2CommentId: 0,
+      CommentReplyId: 0,
+      automateTitle: '',
+      automateOwner: '',
+      automateComment: '',
+      filterWithCase: '',
+      bookMarkClass: 'modal fade',
+      bookMarkDesc: 'Added to your Bookmarks',
+      modalClass: 'modal fade e-backdrop',
+      modalTime: 0,
+      attachments: {},
+      profileAttachments: {},
+      designationList: {},
+      uniqueIds: [],
+      sK0y: "",
+      isHMAC: "",
+      Title: '',
+      dropdownClass: 'dropdown-menu',
+      lang: "en",
+      class: "afkhome-en",
+      englishContent: "",
+      arabicContent: "",
+      addedtoyourbookmarks: "",
+      recent: "",
+      implemented: "",
+      latestsubmissions: "",
+      oldsubmissions: "",
+      mostliked: "",
+      mostcomments: "",
+      onlyyouractivity: "",
+      Recent: "",
+      bookmarksremoved: "",
+    }
+  }
+  public async componentDidMount(): Promise<void> {
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    this.loggedInUser = user.prno;
+    await this.getHMACENABLEorDISABLE();
+    await this.getToken();
+    this.fetchJsonFile('ar.json');
+    this.fetchJsonFile('en.json');
+    this.changeLanguage();
+    //this.getAttachment();
+    // Add scroll event listener when the component mounts
+    window.addEventListener('scroll', this.handleScroll);
+    console.log("scroll")
+    let searchTextfromStorage: any = localStorage.getItem("searchText");
+    console.log(searchTextfromStorage);
+    if (searchTextfromStorage == undefined || searchTextfromStorage === null || searchTextfromStorage === "") {
+      this.searchText = "0"
+    }
+    else {
+      this.searchText = searchTextfromStorage
+    }
+
+
+
+    // Load initial set of ideas
+    setTimeout(() => {
+      this.getAllIdeas(0);
+    }, 1000);
+    // this.getAllIdeas(0);
+    this.getUserAttachment();
+    //this.getAttachmentById(829)
+    //className="modal fade e-backdrop"
+    this.checkGroupMembership();
+  }
+
+  fetchProfileAttachmentsFromComments = async (comments: any[]) => {
+    const fetched = new Set(Object.keys(this.state.profileAttachments));
+
+    for (const comment of comments) {
+      const commenterId = String(comment.submitteremailid);
+      if (commenterId && !fetched.has(commenterId)) {
+        fetched.add(commenterId);
+        await this.fetchAttachmentsForProfile(commenterId); // Your existing method for fetching images
+      }
+    }
+  };
+
+  fetchJsonFile = async (fileName: any) => {
+    try {
+      // Specify the file path in the document library
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
+
+      const filePath = "/sites/qaideation/SiteAssets/IdeationAssets/lang/" + fileName;
+
+      const file = await web.getFileByServerRelativeUrl(filePath).getText();
+
+      console.log(file);
+      const data = JSON.parse(file);
+      console.log('Document Library Items:', data);
+      if (fileName == 'ar.json') {
+        this.setState({ arabicContent: data })
+      }
+      else {
+        this.setState({ englishContent: data })
+      }
+      console.log(this.state.arabicContent, this.state.englishContent)
+      // Parse the JSON data
+
+      // this.setState({ jsonData: data });
+    } catch (error) {
+      console.error("Error fetching JSON file:", error);
+    }
+  };
+
+  public async getToken() {
+
+    const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
+    const listItems: any = await web.lists.getByTitle("TokenDispenser")
+      .items
+      .get();
+    let tokenInfo = [];
+    tokenInfo = listItems;
+    if (tokenInfo.length > 0) {
+      this.setState({
+        token: tokenInfo[0].Token
+      });
+
+      console.log("Token - ", tokenInfo[0].Token);
+    }
+  }
+  public async getHMACENABLEorDISABLE() {
+    try {
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation");
+      const listItems: any = await web.lists.getByTitle("HMACConfigList")
+        .items
+        .get();
+
+      if (listItems.length > 0) {
+        this.setState({
+          sK0y: listItems[0].Key,
+          isHMAC: listItems[0].IsHMAC
+        });
+
+      }
+    } catch (error: any) {
+      console.log('Error loading document URL:', error);
+    }
+  };
+  generateHMAC(message: any, sKey: any) {
+    return CryptoJS.HmacSHA256(message, sKey).toString(CryptoJS.enc.Base64);
+  }
+  componentWillUnmount() {
+    // Remove scroll event listener when the component unmounts to avoid memory leaks
+    window.removeEventListener('scroll', this.handleScroll);
+  }
+  // Function to handle scrolling
+  handleScroll = () => {
+    // Check if the user has scrolled to the bottom of the page
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+      document.documentElement.offsetHeight
+    ) {
+      // Load more items when the bottom is reached
+      this.loadMoreItems();
+    }
+  };
+  // Function to load more items
+  loadMoreItems = () => {
+    // Prevent multiple simultaneous requests
+    if (!this.state.isLoader) {
+      // Set isLoader state to true to indicate loading
+      this.setState({ isLoader: true }, async () => {
+        // Increment the startnum to load the next set of items
+        const newStartnum = this.state.startnum + this.state.limit;
+        // Load data with the new startnum
+        await this.getAllIdeas(newStartnum);
+        // Update startnum in state
+        this.setState({ startnum: newStartnum, isLoader: false });
+      });
+    }
+  };
+  public async getUserAttachment() {
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
+    //let columnName = "InnovationID";
+    // .filter(`${columnName} eq '${InnovationID}'`)
+    const listItems: any = await web.lists.getByTitle("ProfilePicture")
+      .items
+      .filter(`EmailID eq '${user.prno}'`)
+      //.expand(`AttachmentFiles`)
+      .get();
+    console.log(listItems);
+    let attachmentFiles = [];
+    attachmentFiles = listItems;
+    if (attachmentFiles.length > 0) {
+      let attachmentPath = "Lists/" + "ProfilePicture/" + "Attachments/";
+      this.userImageUrl = "https://dewa.sharepoint.com/sites/qaideation/" + attachmentPath + attachmentFiles[0].Id + '/' + attachmentFiles[0].Title;
+
+    }
+    else {
+      this.userImageUrl = "";
+    }
+    console.log(this.userImageUrl);
+  }
+
+  fetchAttachmentsForAllProfile = async (uniqueIds: any) => {
+    for (const Innovators of uniqueIds) {
+      await this.fetchAttachmentsForProfile(Innovators);
+    }
+  };
+
+  fetchAttachmentsForProfile = async (EmailID: any) => {
+    try {
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
+      let allItems: any[] = [];
+      let nextLink: string | null = null;
+
+      const fetchItems = async (url: string) => {
+        const response: any = await web.lists.getByTitle("ProfilePicture")
+          .items
+          .filter(`EmailID eq '${EmailID}'`) //EmailID
+          .expand('AttachmentFiles')
+          .top(100)
+          .getPaged();
+        console.log("profile Response", response);
+        allItems = allItems.concat(response.results);
+        nextLink = response.hasNext ? response.getNext() : null;
+
+        if (nextLink) {
+          await fetchItems(nextLink);
+        }
+      };
+
+      await fetchItems(`https://dewa.sharepoint.com/sites/qaideation/_api/web/lists/getByTitle('ProfilePicture')/items?$filter=EmailID eq ${EmailID}&$expand=AttachmentFiles`);
+
+      let attachmentFiles = allItems;
+      let imageURLList: any = [];
+      if (attachmentFiles.length > 0) {
+        let attachmentPath = "Lists/ProfilePicture/Attachments/";
+        imageURLList = attachmentFiles.map(item => ({
+          imageUrl: `https://dewa.sharepoint.com/sites/qaideation/${attachmentPath}${item.Id}/${item.Title}`,
+          EmailID: item.EmailID
+        }));
+      }
+      else {
+        imageURLList = [{
+          imageUrl: `${DummyProfileimg}`,
+          EmailID: EmailID
+
+        }]
+
+      }
+
+      this.setState((prevState => ({
+        profileAttachments: {
+          ...prevState.profileAttachments,
+          [EmailID]: imageURLList
+        }
+      })));
+      console.log(this.state.profileAttachments);
+    } catch (error) {
+      console.error(`Error fetching attachments for profile ${EmailID}:`, error);
+    }
+  };
+
+  public getmyideas = async (limit: number, action = "", actionWithCase = "") => {
+    debugger;
+    this.setState({ isLoader: true, allIdeaList: [] });
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    console.log("getmyideas", user.userName)
+    let params = {
+
+      userid: user.prno,
+      ideaid: 0,
+      action: "IDEAOWNER"
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+      console.log("headers", headers);
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+      console.log("headers", headers);
+    }
+
+    apiResponse = await this.IdeationServices.getData(params, headers, "myideas");
+    responseData = apiResponse.data;
+
+    let dataList: any = [];
+    dataList = responseData.data;
+    if (dataList.length > 0) {
+      console.log("allIdeaList", dataList);
+      this.setState({
+        isLoader: false,
+        allIdeaList: dataList,
+        filterName: action == "" ? "Recent" : action,
+        filterWithCase: actionWithCase == "" ? this.state.Recent : actionWithCase,
+        modalClass: "modal fade e-backdrop",
+      }, () => {
+        let uniqueIds = dataList.reduce((acc: any, current: any) => {
+          if (!acc.includes(current.submitteremailid)) {
+            acc.push(current.submitteremailid);
+          }
+          return acc;
+        }, []);
+        this.setState({ uniqueIds: uniqueIds });
+        console.log(uniqueIds);
+        this.fetchAttachmentsForAllIdeas();
+        this.fetchAttachmentsForAllProfile(uniqueIds);
+      });
+
+      console.log("State allIdeaList", this.state.allIdeaList);
+      this.setState({ isBookmarkModalOpen: false });
+    }
+    else {
+      if (this.state.modalTime == 0) {
+        this.setState({ modalClass: "modal fade e-backdrop show", isLoader: false });
+      }
+      else {
+        this.setState({ modalClass: "modal fade e-backdrop", isLoader: false });
+      }
+
+    }
+    this.setState({ bookMarkClass: "modal fade" })
+  }
+
+
+  public getAllIdeas = async (startnum = 0, action = "", actionWithCase = "") => {
+    // debugger;
+    if (actionWithCase == "Only your activity") {
+      this.getmyideas(0, "Only your activity", "Only your activity")
+    }
+
+    else {
+
+      // this.setState({ isLoader: true, allIdeaList: [] });
+      let apiResponse: any;
+      let responseData: any = [];
+      let struser: any = localStorage.getItem('userinfo');
+      let user = JSON.parse(struser);
+      console.log("getMyChallenge", user.userName)
+      let params = {
+        userid: (user.prno != undefined && user.prno != null && user.prno != '') ? user.prno : 0,
+        valuechain: 'ALL',
+        targetdivision: 'ALL',
+        benefit: 'ALL',
+        ideapath: 'ALL',
+        innovationenablers: 'ALL',
+        action: action,
+        startnum: startnum,
+        limit: this.state.limit,
+        searchtext: this.searchText
+      }
+      const sK0y = this.state.sK0y;
+      const jString = JSON.stringify(params);
+      const hmacValue = this.generateHMAC(jString, sK0y);
+      let headers: any;
+      let jtv: any = localStorage.getItem("Jtv");
+      let jtvparse = JSON.parse(jtv);
+      if (this.state.isHMAC == "Enable") {
+        headers = {
+          'headers': {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'hmac-base64': hmacValue,
+            'Authorization': `Bearer ${this.state.token}`,
+            'x-jwt-token': jtvparse.Jtv
+          }
+        };
+      }
+      else {
+        headers = {
+          'headers': {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          }
+        };
+      }
+      apiResponse = await this.IdeationServices.getData(params, headers, "getAllIdeas");
+      responseData = apiResponse.data;
+      console.log(params);
+      let dataList: any = [];
+      dataList = responseData.data;
+      //dataList=[];
+      debugger;
+      let backupIdeas: any = []
+      let actionIn: any; // = action == '' || 'Recent' ? 'Recent':action
+      if (action == '' || action == 'Recent') {
+        actionIn = 'Recent'
+      }
+      else {
+        actionIn = action
+      }
+      console.log(actionIn);
+      if (actionIn != this.state.filterName) {
+        backupIdeas = []
+      }
+      else {
+        backupIdeas = this.state.allIdeaList;
+      }
+
+      if (dataList.length > 0) {
+        backupIdeas = this.state.allIdeaList;
+        let allIdeas = backupIdeas.concat(dataList);
+
+        for (let i = 0; i < dataList.length; i++) {
+          dataList[i].original = true;
+          dataList[i].translated = false;
+        }
+
+        this.setState({
+          startnum: startnum,
+          isLoader: false,
+          allIdeaList: allIdeas,
+          filterName: action == "" ? "Recent" : action,
+          filterWithCase: actionWithCase == "" ? this.state.Recent : actionWithCase,
+          modalClass: "modal fade e-backdrop",
+        }, () => {
+          let uniqueIds = dataList.reduce((acc: any, current: any) => {
+            if (!acc.includes(current.ideaowner)) {
+              acc.push(current.ideaowner);
+            }
+            return acc;
+          }, []);
+          this.setState({ uniqueIds: uniqueIds });
+
+          // ✅ Fix: Load and correct comment counts
+          allIdeas.forEach((idea: any) => {
+            this.getIdeaComment(idea.ideaid);
+          });
+
+          this.fetchAttachmentsForAllIdeas();
+          this.fetchAttachmentsForAllProfile(uniqueIds);
+          this.fetchDesignationForAllIdeas();
+        });
+
+        this.setState({ isBookmarkModalOpen: false });
+      } else {
+        this.setState({
+          isLoader: false,
+          filterName: action == "" ? "Recent" : action,
+          filterWithCase: actionWithCase == "" ? this.state.Recent : actionWithCase,
+          modalClass: "modal fade e-backdrop",
+        });
+
+        if (backupIdeas.length > 0) {
+          this.setState({ allIdeaList: backupIdeas });
+        } else {
+          this.setState({ allIdeaList: dataList });
+        }
+      }
+
+      if (this.state.allIdeaList.length == 0) {
+        this.isLoadMore = false;
+      }
+
+      this.setState({ bookMarkClass: "modal fade" });
+    }
+  }
+  // public async getToken() {
+
+  //   const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
+  //   //let columnName = "InnovationID";
+  //   // .filter(`${columnName} eq '${InnovationID}'`)
+  //   const listItems: any = await web.lists.getByTitle("TokenDispenser")
+  //     .items
+  //     .get();
+  //   // Assuming you want to store attachment file names in the state
+  //   let tokenInfo = [];
+  //   tokenInfo = listItems;
+  //   console.log("tokenInfo", tokenInfo);
+  //   if (tokenInfo.length > 0) {
+  //     this.setState({ token: tokenInfo[0].Token })
+  //     //this.getAllIdeas(0);
+  //     console.log("Token - ", tokenInfo[0].Token);
+  //   }
+  // }
+  private async checkGroupMembership(): Promise<void> {
+    const { spHttpClient, siteUrl, currentUserLoginName } = this.props;
+
+    const endpoint = `${siteUrl}/_api/web/sitegroups/getbyname('${GROUP_NAME}')/users`;
+
+    try {
+      const response = await spHttpClient.get(endpoint, SPHttpClient.configurations.v1);
+      const data = await response.json();
+      console.log(data);
+      const isUserInGroup = data.value.some((user: any) =>
+        user.Email.toLowerCase() === currentUserLoginName.toLowerCase()
+      );
+
+      this.setState({ isInGroup: isUserInGroup });
+    } catch (error) {
+      console.error("Error checking group membership:", error);
+      this.setState({ error: "Could not check group membership", isInGroup: false });
+    }
+  }
+  formatTimeElapsed = (timestamp: any) => {
+    const commentDate: any = new Date(timestamp);
+    const currentDate: any = new Date();
+
+    const millisecondsPerSecond = 1000;
+    const millisecondsPerMinute = millisecondsPerSecond * 60;
+    const millisecondsPerHour = millisecondsPerMinute * 60;
+    const millisecondsPerDay = millisecondsPerHour * 24;
+    const millisecondsPerWeek = millisecondsPerDay * 7;
+    const millisecondsPerMonth = millisecondsPerDay * 30.44; // Approximate days per month
+    const millisecondsPerYear = millisecondsPerDay * 365;
+
+    const elapsedMilliseconds = currentDate - commentDate;
+
+    if (elapsedMilliseconds < millisecondsPerMinute) {
+      return 'Just now';
+    } else if (elapsedMilliseconds < millisecondsPerHour) {
+      const minutes = Math.floor(elapsedMilliseconds / millisecondsPerMinute);
+      return `${minutes}m ago`;
+    } else if (elapsedMilliseconds < millisecondsPerDay) {
+      const hours = Math.floor(elapsedMilliseconds / millisecondsPerHour);
+      return `${hours}h ago`;
+    } else if (elapsedMilliseconds < millisecondsPerWeek) {
+      const days = Math.floor(elapsedMilliseconds / millisecondsPerDay);
+      if (days === 1) {
+        return '1d ago';
+      } else {
+        return `${days}d ago`;
+      }
+    } else if (elapsedMilliseconds < millisecondsPerMonth) {
+      const weeks = Math.floor(elapsedMilliseconds / millisecondsPerWeek);
+      if (weeks === 1) {
+        return '1w ago';
+      } else {
+        return `${weeks}w ago`;
+      }
+    } else if (elapsedMilliseconds < millisecondsPerYear) {
+      const months = Math.floor(elapsedMilliseconds / millisecondsPerMonth);
+      if (months === 1) {
+        return '1m ago';
+      } else {
+        return `${months}m ago`;
+      }
+    } else {
+      const years = Math.floor(elapsedMilliseconds / millisecondsPerYear);
+      if (years === 1) {
+        return '1y ago';
+      } else {
+        return `${years}y ago`;
+      }
+    }
+  };
+  public submitVote = async (ideaId: any, isLike: any, isDisLike: string, ideaOwner: any, ideaTitle: any, isbookmarked: any, isShare: any) => {
+    debugger;
+    this.langCode = this.state.lang == 'ar' ? '14337' : '1033'
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    let params = {
+      ideaid: ideaId,
+      userid: user.prno,
+      idealike: isLike,
+      ideadislike: isDisLike,
+      suggestions: "",
+      shareidea: isShare,
+      bookmark: isbookmarked,
+      submitteremailid: user.prno,
+      submitterusername: user.prno,
+      languagecode: this.langCode
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.postData(params, headers, "SubmitVote");
+    responseData = apiResponse.data;
+    console.log(responseData);
+    if (responseData.data.respcode > 0) {
+      this.insertNotification("Voted for your idea - " + ideaTitle, "Vote", ideaId, ideaOwner, "Home");
+      console.log("SubmitVote Res", responseData.data);
+      // this.getAllIdeas(0, this.state.filterName);
+      let dataList = this.state.allIdeaList.filter((a: any) => a.ideaid == ideaId);
+      let voteCount = isLike == 1 ? dataList[0].votecnt + 1 : dataList[0].votecnt - 1;
+      this.setState((prevState) => ({
+        allIdeaList: prevState.allIdeaList.map((item: any) =>
+          item.ideaid === ideaId
+            ? {
+              ...item, clicked: !item.clicked,
+              uservote: isLike,
+              userbookmark: isbookmarked,
+              votecnt: voteCount
+
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+    }
+    console.log(this.state.allIdeaList)
+
+  }
+  public insertNotification = async (notificationTitle: any, status: any, ideaId: any, ideaOwner: any, pageAction: any) => {
+    debugger;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    let params = {
+      userid: user.prno,
+      notificationTitle: notificationTitle,
+      status: status,
+      useremailID: user.prno,
+      submitteremailid: user.prno,
+      submittername: user.prno,
+      ideaid: ideaId,
+      ideaowner: ideaOwner,
+      pageaction: pageAction,
+      action: "ADD",
+      notificationid: 0,
+      emailstatus: "",
+      emaillink: "",
+      emailtouserid: "",
+      isread: 0
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.postData(params, headers, "insertafkarinotification");
+    responseData = apiResponse.data;
+    if (responseData.data.respcode > 0) {
+      console.log("insert afkari notification Res", responseData.data);
+    }
+
+  }
+  public submitBookmark = async (ideaId: any, isLike: any, isDisLike: any, isBookmark: any) => {
+    debugger;
+    this.setState({ isBookmarkModalOpen: true })
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    let params = {
+      ideaid: ideaId,
+      userid: user.prno,
+      idealike: isLike,
+      ideadislike: isDisLike,
+      suggestions: "",
+      shareidea: "0",
+      bookmark: isBookmark,
+      submitteremailid: user.prno,
+      submitterusername: user.prno
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.postData(params, headers, "SubmitVote");
+    responseData = apiResponse.data;
+    if (responseData.data.respcode > 0) {
+      console.log("SubmitVote Res", responseData.data);
+      if (isBookmark == 0) {
+        this.setState({ bookMarkClass: "modal fade show", bookMarkDesc: this.state.bookmarksremoved })
+      } else if (isBookmark == 1) {
+        this.setState({ bookMarkClass: "modal fade show", bookMarkDesc: this.state.addedtoyourbookmarks })
+      }
+      this.setState((prevState) => ({
+        allIdeaList: prevState.allIdeaList.map((item: any) =>
+          item.ideaid === ideaId
+            ? {
+              ...item,
+              userbookmark: isBookmark
+
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+      setTimeout(() => {
+        this.setState({ bookMarkClass: "model in", bookMarkDesc: "" });
+        let bookmarkmodal = document.getElementById("Bookmarkmodal");
+        if (bookmarkmodal) {
+          bookmarkmodal.setAttribute("style", "display:none");
+        }
+      }, 3000);
+    }
+  }
+  public removeBookmark = async (ideaId: any, isLike: any, isDisLike: any) => {
+    debugger;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    let params = {
+      ideaid: ideaId,
+      userid: user.prno,
+      idealike: isLike,
+      ideadislike: isDisLike,
+      suggestions: "",
+      shareidea: "0",
+      bookmark: "0",
+      submitteremailid: user.prno,
+      submitterusername: user.prno
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.postData(params, headers, "SubmitVote");
+    responseData = apiResponse.data;
+    if (responseData.data.respcode > 0) {
+      console.log("SubmitVote Res", responseData.data);
+      this.setState((prevState) => ({
+        allIdeaList: prevState.allIdeaList.map((item: any) =>
+          item.ideaid === ideaId
+            ? {
+              ...item,
+              userbookmark: 0
+
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+    }
+
+  }
+  public submitComment = async (ideaId: any,commentID: any = 0, action: any = "ADD", ideaOwner: any = "", ideaTitle: any = "") => {
+    debugger;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    let commentToSave: any;
+    // commentID = this.state.editID == 0 ? commentID : this.state.editID;
+    // if(action != "ADD"){
+    //   action = this.state.editID == 0 ? action : "UPDATE";
+    // }
+
+    commentToSave = commentID == 0 ? this.state.comment : this.state.editComment;
+    let params = {
+      userid: user.prno,
+      IDEAID: ideaId,
+      cOMMENTS: commentToSave,//this.state.comment,
+      COMMENTID: commentID,
+      submitteremailid: user.prno,
+      submitterusername: user.prno,
+      ACTION: action
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.postData(params, headers, "submitIdeaComment");
+    responseData = apiResponse.data;
+    if (responseData.data.respcode > 0) {
+      if (action == "commenthide") {
+        this.callPowerAutomate(
+          ideaId,
+          this.state.automateTitle,
+          this.state.automateOwner,
+          this.state.automateComment,
+          user.userName
+        );
+      }
+      if (action == "ADD") {
+        this.insertNotification("Commented on your idea - " + ideaTitle, "Comment", ideaId, ideaOwner, "Home");
+        let dataList = this.state.allIdeaList.filter((a: any) => a.ideaid == ideaId);
+        let commentcnt = dataList[0].commentcnt + 1
+        this.setState((prevState) => ({
+          allIdeaList: prevState.allIdeaList.map((item: any) =>
+            item.ideaid === ideaId
+              ? {
+                ...item,
+                commentcnt: commentcnt,
+              } // Add translatedText for the matched item
+              : item // Keep the other items unchanged
+          )
+        }));
+
+      }
+      if (action == "DELETE") {
+        this.insertNotification("Commented on your idea - " + ideaTitle, "Comment", ideaId, ideaOwner, "Home");
+        let dataList = this.state.allIdeaList.filter((a: any) => a.ideaid == ideaId);
+        let commentcnt = dataList[0].commentcnt - 1
+        this.setState((prevState) => ({
+          allIdeaList: prevState.allIdeaList.map((item: any) =>
+            item.ideaid === ideaId
+              ? {
+                ...item,
+                commentcnt: commentcnt,
+              } // Add translatedText for the matched item
+              : item // Keep the other items unchanged
+          )
+        }));
+
+      }
+      if (action == "UPDATE") {
+        this.setState(prevState => ({
+          isReplyShowtextBox: {
+            ...prevState.isReplyShowtextBox,
+            [commentID]: !prevState.isReplyShowtextBox[commentID]
+          },
+          //editComment:editComment
+        }));
+      }
+      console.log("submitIdeaComment Res", responseData.data);
+      this.setState({
+        comment: ""
+      });
+      this.getIdeaComment(ideaId);
+      this.getAllIdeas(0, this.state.filterName)
+
+    }
+
+  }
+  public editComment(comment: any, commentID: number = 0, ideaID: any = 0) {
+
+    this.setState({
+      comment: comment,
+      editID: commentID,
+      ideaID: ideaID
+    });
+  }
+  public submitVoteForComment = async (ideaId: any, commentId: any, isLike: string) => {
+    debugger;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    let params = {
+      IDEACOMMENTID: commentId,
+      IDEAID: ideaId,
+      userid: user.userName,
+      isLike: isLike,
+      submitteremailid: user.userEmailID,
+      submittername: user.userName,
+    };
+
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    } else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+
+    apiResponse = await this.IdeationServices.postData(params, headers, "SUBMITIDEAVOTEFORCOMMENT");
+    responseData = apiResponse.data;
+
+    if (responseData.data.respcode > 0) {
+      console.log("SUBMITIDEAVOTEFORCOMMENT Res", responseData.data);
+
+      // ✅ IMMEDIATE UI STATE UPDATE (best UX)
+      const updatedCommentList = this.state.commentList.map((commentItem: { commentid: any; votecount: string; }) => {
+        if (commentItem.commentid === commentId) {
+          const updatedVoteCount = isLike === "1"
+            ? parseInt(commentItem.votecount) + 1
+            : parseInt(commentItem.votecount) - 1;
+
+          return {
+            ...commentItem,
+            votecount: updatedVoteCount.toString(),
+            uservotecount: isLike
+          };
+        }
+        return commentItem;
+      });
+
+      this.setState({ commentList: updatedCommentList });
+
+      // 🔄 OPTIONAL: refresh full comment data from backend
+      // this.getIdeaComment(ideaId);
+    }
+  }
+
+  public toggleCommentShow = (ideaId: any) => {
+    this.setState(prevState => ({
+      isCommentShow: {
+        ...prevState.isCommentShow,
+        [ideaId]: !prevState.isCommentShow[ideaId]
+      }
+    }));
+    this.getIdeaComment(ideaId);
+
+  }
+
+  fetchDesignationsFromComments = async (comments: any[]) => {
+    const fetched = new Set(Object.keys(this.state.designationList));
+
+    for (const comment of comments) {
+      const commenterId = String(comment.submitteremailid);  // ID you're using in render
+      if (commenterId && !fetched.has(commenterId)) {
+        fetched.add(commenterId);
+        await this.getEmployeeDetails(commenterId, comment.submitteremailid);  // just one param now
+      }
+    }
+  };
+
+  public getIdeaComment = async (ideaId: any) => {
+    debugger;
+    this.currentCommentId = ideaId;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    //console.log("getMyChallenge", user.userName)
+    let params = {
+      userid: user.prno,
+      //userid: myid,
+      IDEAID: ideaId
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.getData(params, headers, "getIdeaComments");
+    responseData = apiResponse.data;
+    console.log(responseData);
+
+    let dataList: any = [];
+    dataList = responseData.data;
+    //console.log(responseData);
+    dataList = responseData.data;
+    console.log(dataList);
+
+    // ⛔ Filter out hidden/reported comments
+    debugger;
+    dataList = dataList.filter((comment: any) => comment.isvisible !== false && comment.action !== "commenthide");
+    // Update comment count for ideaId
+    const visibleCommentCount = dataList.length;
+    this.setState((prevState) => ({
+      allIdeaList: prevState.allIdeaList.map((item: any) =>
+        item.ideaid === ideaId
+          ? {
+            ...item,
+            commentcnt: visibleCommentCount
+          }
+          : item
+      )
+    }));
+
+    this.setState({ commentList: [] })
+    for (let i = 0; i < dataList.length; i++) {
+      dataList[i].original = true;
+      //dataList[i].translated = false;
+    }
+    if (dataList.length > 0) {
+      console.log("commentList", dataList);
+      let isCommentMoreTwo = dataList.length > 2 ? true : false;
+      // Slice the first 2 comments initially
+      const initialComments = dataList.slice(0, 2);
+      this.commentdatalist = dataList;
+      this.isCommentMoreTwo = isCommentMoreTwo;
+      this.initialComments = initialComments;
+      this.setState(prevState => ({
+        commentList: initialComments,
+        isCommentLoadMore: isCommentMoreTwo,
+        allCommentList: dataList,
+        comment: ""
+      }),
+        async () => {
+          await this.fetchDesignationsFromComments(dataList);         // Fetch names/designations
+          await this.fetchProfileAttachmentsFromComments(dataList);   // ✅ Fetch profile images
+        }
+      );
+      //await this.fetchDesignationsFromComments(this.state.commentList);
+
+    }
+
+  }
+  loadMoreComments = async (ideaId: any) => {
+    const currentComments = this.state.commentList;
+    const remainingComments = this.state.allCommentList.slice(0, currentComments.length + 2);
+
+    this.setState({
+      commentList: remainingComments
+    });
+    await this.fetchDesignationsFromComments(remainingComments);
+    await this.fetchProfileAttachmentsFromComments(remainingComments);
+    if (this.state.allCommentList.length == remainingComments.length) {
+      this.setState({
+        isCommentLoadMore: false
+      });
+    }
+  }
+  public getIdeaCommentVoteAndReplyCount = async (commentID: any) => {
+    debugger;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    console.log("getMyChallenge", user.userName)
+    let params = {
+      userid: user.prno,
+      commentid: commentID
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.getData(params, headers, "getrepliescountforcomment");
+    responseData = apiResponse.data;
+
+    let dataList: any = [];
+    dataList = responseData.data;
+    if (dataList.length > 0) {
+      console.log("commentList", dataList);
+
+      this.setState({
+        commentList: dataList
+      })
+
+    }
+
+  }
+  public onChangeComment(e: any, selctedOptions: any) {
+    this.setState({
+      comment: selctedOptions
+    });
+  }
+  public handleKeyPress = (e: any, ideaID: any, ideaTitle: any, ideaOwner: any) => {
+    debugger;
+    if (e.key === 'Enter') {
+      if (this.state.comment == "") {
+        return false;
+      }
+      this.submitComment(ideaID, 0, 'ADD', ideaOwner, ideaTitle);
+      //this.submitComment(ideaID);
+    }
+  }
+
+  public getIdeaReplyComment = async (commentId: any) => {
+    debugger;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    console.log("getMyChallenge", user.userName)
+    let params = {
+      userid: user.prno,
+      commentid: commentId
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.getData(params, headers, "getrepliesforcomment");
+    responseData = apiResponse.data;
+
+    let dataList: any = [];
+    dataList = responseData.data;
+    if (dataList.length > 0) {
+      console.log("commentList", dataList);
+      // Slice the first 2 comments initially
+      //if(callFrom !='callFromSubmitReply'){
+      const initialComments = dataList.slice(0, 2);
+
+      this.setState(prevState => ({
+        commentList: initialComments,
+        allReplyCommentList: dataList,
+
+      }));
+      // }
+      // else{
+      //   this.setState({commentList:dataList})
+      // }
+
+    }
+
+  }
+  public async getAttachment() {
+    const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
+    //let columnName = "InnovationID";
+    // .filter(`${columnName} eq '${InnovationID}'`)
+    const listItems: any = await web.lists.getByTitle("IdeaAttachments")
+      .items
+      .expand(`AttachmentFiles`)
+      .get();
+    // Assuming you want to store attachment file names in the state
+    let attachmentFiles = [];
+    let imageURLList = [];
+    attachmentFiles = listItems;
+    console.log("attachmentFileNames", attachmentFiles);
+    if (attachmentFiles.length > 0) {
+      let attachmentPath = "Lists/" + "IdeaAttachments" + "/Attachments/";
+      for (let i = 0; i < attachmentFiles.length; i++) {
+        let imageUrl = "";
+        imageUrl = "https://dewa.sharepoint.com/sites/qaideation/" + attachmentPath + attachmentFiles[i].Id + '/' + attachmentFiles[i].Title;
+        imageURLList.push({ imageUrl: imageUrl, IdeaID: attachmentFiles[i].IdeaID })
+      }
+      this.setState({ imageList: imageURLList });
+      console.log("imageList", imageURLList);
+    }
+    else {
+      this.setState({ imageList: [] });
+    }
+
+  }
+  getImageURL(ideaId: any) {
+    const imageURLs: any = [];
+    if (this.state.imageList.length > 0) {
+      const filteredImages = this.state.imageList.filter((image: any) => parseInt(image.IdeaID) === ideaId);
+      filteredImages.forEach((image: any) => {
+        if (image.imageUrl) {
+          imageURLs.push(image.imageUrl);
+        }
+      });
+    }
+    return imageURLs;
+  }
+  fetchAttachmentsForAllIdeas = async () => {
+    for (const idea of this.state.allIdeaList) {
+      await this.fetchAttachmentsForIdea(idea.ideaid);
+    }
+  };
+
+  fetchDesignationForAllIdeas = async () => {
+    console.log(this.state.allIdeaList);
+    for (const idea of this.state.allIdeaList) {
+      await this.getEmployeeDetails(idea.ideaowner, idea.submitteremailid);
+    }
+  };
+
+  fetchAttachmentsForIdea = async (ideaId: number) => {
+    try {
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
+      let allItems: any[] = [];
+      let nextLink: string | null = null;
+
+      const fetchItems = async (url: string) => {
+        const response: any = await web.lists.getByTitle("IdeaAttachments")
+          .items
+          .filter(`IdeaID eq ${ideaId}`)
+          .expand('AttachmentFiles')
+          .top(100)
+          .getPaged();
+        console.log("IdeaAttachments Response", response);
+        allItems = allItems.concat(response.results);
+        nextLink = response.hasNext ? response.getNext() : null;
+
+        if (nextLink) {
+          await fetchItems(nextLink);
+        }
+      };
+
+      await fetchItems(`https://dewa.sharepoint.com/sites/qaideation/_api/web/lists/getByTitle('IdeaAttachments')/items?$filter=IdeaID eq ${ideaId}&$expand=AttachmentFiles`);
+
+      let attachmentFiles = allItems;
+      let imageURLList: any = [];
+
+      if (attachmentFiles.length > 0) {
+        let attachmentPath = "Lists/IdeaAttachments/Attachments/";
+        for (let i = 0; i < attachmentFiles.length; i++) {
+          if (attachmentFiles[i].Title.includes('jpg') ||
+            attachmentFiles[i].Title.includes('jpeg') ||
+            attachmentFiles[i].Title.includes('png')) {
+            imageURLList.push([{
+              imageUrl: `https://dewa.sharepoint.com/sites/qaideation/${attachmentPath}${attachmentFiles[i].Id}/${attachmentFiles[i].Title}`,
+              IdeaID: ideaId,
+              pdfUrl: '',
+              videoUrl: ''
+            }])
+          }
+          else if (attachmentFiles[i].Title.includes('pdf')) {
+            imageURLList.push([{
+              imageUrl: `${hbanner10}`,
+              IdeaID: ideaId,
+              pdfUrl: `https://dewa.sharepoint.com/sites/qaideation/${attachmentPath}${attachmentFiles[i].Id}/${attachmentFiles[i].Title}`,
+              videoUrl: ''
+            }])
+          }
+          else if (attachmentFiles[i].Title.includes('mp4') ||
+            attachmentFiles[i].Title.includes('mov')
+          ) {
+            imageURLList.push([{
+              imageUrl: '',
+              IdeaID: ideaId,
+              pdfUrl: '',
+              videoUrl: `https://dewa.sharepoint.com/sites/qaideation/${attachmentPath}${attachmentFiles[i].Id}/${attachmentFiles[i].Title}`
+            }])
+          }
+
+        }
+        // imageURLList = attachmentFiles.map(item => ({
+        //  imageUrl: `https://dewa.sharepoint.com/sites/qaideation/${attachmentPath}${item.Id}/${item.Title}`,
+        // IdeaID: item.IdeaID
+        // }));
+
+      }
+      else {
+        imageURLList.push([{
+          imageUrl: `${hbanner10}`,
+          pdfUrl: '',
+          videoUrl: '',
+          IdeaID: ideaId
+        }])
+
+      }
+      this.setState((prevState => ({
+        attachments: {
+          ...prevState.attachments,
+          [ideaId]: imageURLList
+        }
+      })));
+      console.log(this.state.attachments);
+      console.log(imageURLList)
+    } catch (error) {
+      console.error(`Error fetching attachments for idea ${ideaId}:`, error);
+    }
+  };
+  public formatDate(dateString: any) {
+    const date = new Date(dateString);
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const formattedDate = monthNames[monthIndex] + ' ' + ('0' + day).slice(-2);
+
+    return formattedDate;
+  }
+  public getYearFromDate(dateString: any) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+
+    return year;
+  }
+  // private openSuccessDialog = () => {
+  //   this.setState({ isSuccessDialogVisible: true });
+  // };
+
+  private closeSuccessDialog = () => {
+    this.setState({ isSuccessDialogVisible: false });
+
+  };
+  // private openErrorDialog = () => {
+  //   this.setState({ isDialogVisible: true });
+  // };
+
+  private closeErrorDialog = () => {
+    this.setState({ isDialogVisible: false });
+  };
+  public toggleReplyCommentShow = (ideaCommentId: any,ideaItemId: any) => {
+    debugger;
+    this.setState(prevState => ({
+      isReplyCommentShow: {
+        ...prevState.isReplyCommentShow,
+        [ideaCommentId]: !prevState.isReplyCommentShow[ideaCommentId]
+      }
+    }));
+    this.getIdeaCommentReply(ideaCommentId,ideaItemId);
+  };
+  public getIdeaCommentReply = async (commentId: any,ideaItemId: any) => {
+    console.log(ideaItemId);
+    debugger;
+    let apiResponse: any;
+    let responseData: any = [];
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    console.log("getMyChallenge", user.userName)
+    let params = {
+      userid: user.prno,
+      commentid: commentId
+    }
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.getData(params, headers, "getrepliesforcomment");
+    responseData = apiResponse.data;
+
+    let dataList: any = [];
+    this.setState(prevState => ({
+      replyStage1CommentList: {
+        ...prevState.replyStage1CommentList,
+        [commentId]: dataList
+      }
+    }));
+    dataList = responseData.data;
+    if (dataList.length > 0) {
+      console.log("commentList", dataList);
+      // Slice the first 2 comments initially
+      //const initialComments = dataList.slice(0, 2);
+
+      // this.setState(prevState => ({
+      //   commentList: initialComments,
+      //   allReplyCommentList: dataList,
+      //   comment: ""
+      // }));
+      //this.setState({ replyStage1CommentList: dataList })
+      this.setState(prevState => ({
+        replyStage1CommentList: {
+          ...prevState.replyStage1CommentList,
+          [commentId]: dataList
+        }
+      }));
+
+    }
+    this.getIdeaComment(ideaItemId);
+  }
+  public SubmitReplyForIdeaComment = async (ideaCommentId: any, replyCommentID: any = 0, ideaId: any,action: any = "ADD", ideaOwner: any = "", ideaTitle: any = "") => {
+    debugger;
+
+    let apiResponse: any;
+    let responseData: any = [];
+    let commentToSave: any;
+    let struser: any = localStorage.getItem('userinfo');
+    let user = JSON.parse(struser);
+    replyCommentID = this.state.CommentReplyId == 0 ? replyCommentID : this.state.CommentReplyId;
+    if (action != 'DELETE' && action != 'replyhide' && action != "ADD") {
+      action = this.state.ideaReply2CommentId == 0 ? action : "UPDATE";
+    }
+
+    commentToSave = this.state.ideaReply2CommentId == 0 ? this.state.replyStage1Comment : this.state.editReplyComment;
+    let params = {
+      IDEACOMMENTID: ideaCommentId,
+      IDEAID: ideaId,
+      repliesid: replyCommentID,
+      userid: user.prno,
+      comment: commentToSave,
+      submitteremailid: user.prno,
+      submittername: user.prno,
+      action: action
+    }
+
+    const sK0y = this.state.sK0y;
+    const jString = JSON.stringify(params);
+    const hmacValue = this.generateHMAC(jString, sK0y);
+    let jtv: any = localStorage.getItem("Jtv");
+    let jtvparse = JSON.parse(jtv);
+    let headers: any;
+    if (this.state.isHMAC == "Enable") {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'hmac-base64': hmacValue,
+          'Authorization': `Bearer ${this.state.token}`,
+          'x-jwt-token': jtvparse.Jtv
+        }
+      };
+    }
+    else {
+      headers = {
+        'headers': {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      };
+    }
+    apiResponse = await this.IdeationServices.postData(params, headers, "SubmitReplyForIdeaComment");
+    responseData = apiResponse.data;
+    if (responseData.data.respcode > 0) {
+      if (action == "replyhide") {
+        this.callPowerAutomate(
+          ideaId,
+          this.state.automateTitle,
+          this.state.automateOwner,
+          this.state.automateComment,
+          user.userName
+        );
+      }
+      if (action == "UPDATE" || action == "replyhide") {
+        this.setState(prevState => ({
+          isReply2ShowtextBox: {
+            ...prevState.isReply2ShowtextBox,
+            [replyCommentID]: !prevState.isReply2ShowtextBox[replyCommentID]
+          },
+          //editComment:editComment
+        }));
+        console.log("SubmitReplyForIdeaComment Res", responseData.data);
+        this.setState({
+          replyStage1Comment: ""
+        });
+      }
+
+
+    }
+    this.setState({
+      replyStage1Comment: '',
+      editReplyComment: '', ideaReply2CommentId: 0
+    })
+    this.getIdeaCommentReply(ideaCommentId, ideaId)
+
+
+    //this.getIdeaReplyComment(ideaCommentId,"callFromSubmitReply");
+  }
+  public onChangeReplyComment(e: any, selctedOptions: any) {
+    debugger;
+    this.setState({
+      replyStage1Comment: selctedOptions
+    });
+  }
+  public handleKeyPressReplyComment = (e: any, commentID: any, ideaItemId: any) => {
+    debugger;
+    if (e.key === 'Enter') {
+      if (this.state.replyStage1Comment == "") {
+        return false;
+      }
+      this.setState({ ideaReply2CommentId: 0, CommentReplyId: 0 })
+      this.SubmitReplyForIdeaComment(commentID, 0, ideaItemId, 'ADD');
+    }
+  }
+
+  public toggleReplyShowtextBox = (editComment: any, ideaCommentId: any) => {
+    debugger;
+    this.setState(prevState => ({
+      isReplyShowtextBox: {
+        ...prevState.isReplyShowtextBox,
+        [ideaCommentId]: !prevState.isReplyShowtextBox[ideaCommentId]
+      },
+      editComment: editComment
+    }));
+  };
+  public onChangeEditComment(e: any, selctedOptions: any) {
+    this.setState({
+      editComment: selctedOptions
+    });
+  }
+  public handleKeyPressEditComment = (e: any, ideaId: any, commentId: any) => {
+    if (e.key === 'Enter') {
+      if (this.state.editComment == "") {
+        return false;
+      }
+      this.setState({
+        editID: commentId
+      })
+      //submitComment = async (ideaId: any, commentID: any = 0, action:
+      this.submitComment(ideaId, commentId, 'UPDATE');
+    }
+  }
+
+  reportComment = () => {
+    const { reportIdeaId, reportCommentId, automateTitle, automateOwner, automateComment } = this.state;
+
+    this.setState({ editID: 0 });
+
+    // Submit comment hide action
+    this.submitComment(reportIdeaId, reportCommentId, "commenthide");
+
+    // ✅ DECREASE comment count locally
+    const updatedIdeas = this.state.allIdeaList.map((item: any) => {
+      if (item.ideaid === reportIdeaId) {
+        const newCount = Math.max(item.commentcnt - 1, 0); // prevent negative count
+        return {
+          ...item,
+          commentcnt: newCount
+        };
+      }
+      return item;
+    });
+
+    this.setState({ allIdeaList: updatedIdeas });
+
+    // Trigger automation if needed
+    this.callPowerAutomate(reportIdeaId, automateTitle, automateOwner, automateComment, localStorage.getItem('userinfo'));
+
+    // Close the dialog
+    this.closestage1CommentReportDialog();
+  };
+
+
+
+
+  closestage1CommentReportDialog = () => {
+    this.setState({ stage1CommentReportDialog: false })
+  }
+  reportStage2CommentId(ideaId: any, commentId: any, repliesId: any, ideatitle: any, owner: any, comment: any) {
+    this.setState({
+      reportIdeaId: ideaId, reportCommentId: commentId,
+      stage2CommentReportDialog: true, reportRepliesId: repliesId,
+      automateTitle: ideatitle, automateOwner: owner, automateComment: comment
+    })
+  }
+  reportStage2Comment = () => {
+    //SubmitReplyForIdeaComment = async (ideaCommentId: any, replyCommentID: any = 0,ideaId:any, action: any = "ADD", ideaOwner: any = "", ideaTitle: any = "")
+    this.SubmitReplyForIdeaComment(this.state.reportCommentId, this.state.reportRepliesId, this.state.reportIdeaId, "replyhide");
+    this.closestage2CommentReportDialog();
+  }
+  closestage2CommentReportDialog() {
+    this.setState({ stage2CommentReportDialog: false })
+  }
+  public onChangeReplyEditComment(e: any, selctedOptions: any) {
+    this.setState({
+      editReplyComment: selctedOptions
+    });
+  }
+  public handleKeyPressReplyEditComment = (e: any, ideaCommentId: any, CommentReplyId: any) => {
+    debugger;
+    if (e.key === 'Enter') {
+      if (this.state.editReplyComment == "") {
+        return false;
+      }
+      this.setState({
+        ideaReply2CommentId: ideaCommentId,
+        CommentReplyId: CommentReplyId
+      })
+      this.SubmitReplyForIdeaComment(ideaCommentId, CommentReplyId, 0, "UPDATE")
+
+    }
+  }
+  public toggleEditReplyShowtextBox = (ideaCommentId: any, CommentReplyId: any, comments: any) => {
+
+    debugger;
+    this.setState(prevState => ({
+      isReply2ShowtextBox: {
+        ...prevState.isReply2ShowtextBox,
+        [CommentReplyId]: !prevState.isReply2ShowtextBox[CommentReplyId]
+      },
+      ideaReply2CommentId: ideaCommentId,
+      CommentReplyId: CommentReplyId,
+      editReplyComment: comments
+    }));
+  };
+  reportCommentId(ideaId: any, commentId: any, ideaTitle: any, owner: any, comments: any) {
+    this.setState({
+      reportIdeaId: ideaId, reportCommentId: commentId,
+      stage1CommentReportDialog: true, automateTitle: ideaTitle, automateOwner: owner,
+      automateComment: comments
+    })
+  }
+  public async callPowerAutomate(
+    p_ideaID: any,
+    p_ideaTitle: any,
+    p_ideaOwner: any,
+    p_comment: any,
+    reporter: any
+  ) {
+    try {
+      let struser: any = localStorage.getItem("userinfo");
+      let user = JSON.parse(struser);
+      let loggedInUserId = user.userEmailID;
+      let loggedInUser = user.userName;
+      // Define your parameters
+      const ideaID = p_ideaID;
+      const ideaTitle = p_ideaTitle;
+      const ideaOwner = p_ideaOwner;
+      const comment = p_comment;
+      const reportedUser = reporter;
+      let url: any = "";
+
+      url = `https://prod-23.uaenorth.logic.azure.com:443/workflows/e78edf52a2b5453190fcc55354aa8464/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hX9bxY4Eqozl6zIZZl-JwmZrvmmpYPR387kK7px9NyU&ideaID=${ideaID}&ideaTitle=${ideaTitle}&ideaOwner=${ideaOwner}&comment=${comment}&reportedUser=${reportedUser}&loggedInUser=${loggedInUser}&loggedInUserId=${loggedInUserId}`;
+
+      // Make the GET request
+      const resp = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Check if the request was successful
+      if (resp.ok) {
+        const result = await resp.json();
+        alert("Successfully Flow triggered");
+        console.log(result);
+      } else {
+        // Handle HTTP error status
+        console.error(`Error: ${resp.status} - ${resp.statusText}`);
+      }
+    } catch (error) {
+      // Handle other errors
+      console.error("Error:", error);
+    }
+  }
+
+  redirectInnerPage(id: any) {
+    console.log(id)
+    window.location.replace("https://dewa.sharepoint.com.mcas.ms/sites/qaideation/SitePages/IdeaInnerPage.aspx?ideaID=" + id);
+  }
+
+  handleCopy(id: any, isLike: string, isDisLike: any, ideaOwner: any, ideaTitle: any, isbookmarked: any, isShare: any) {
+    //this.handleCopy(item.ideaid,item.uservote,!item.uservote,item.ideaowner,item.ideatitle,item.userbookmark,1)
+    // Access the item you want to copy (e.g., text)
+    const itemToCopy = "https://dewa.sharepoint.com.mcas.ms/sites/qaideation/SitePages/IdeaInnerPage.aspx?ideaID=" + id;
+
+    // Create a temporary textarea element to perform the copy action
+    const tempTextarea = document.createElement('textarea');
+    tempTextarea.value = itemToCopy;
+    document.body.appendChild(tempTextarea);
+    debugger;
+    // Select and copy the item content
+    tempTextarea.select();
+    document.execCommand('copy');
+
+    // Remove the temporary textarea
+    document.body.removeChild(tempTextarea);
+
+    // Optionally, provide feedback to the user
+    console.log('Link copied to clipboard!');
+    this.submitVote(id, isLike, isDisLike, ideaOwner, ideaTitle, isbookmarked, isShare)
+
+  }
+
+  redirectToMessage(id: any, isLike: string, isDisLike: any, ideaOwner: any, ideaTitle: any, isbookmarked: any, isShare: any) {
+    this.submitVote(id, isLike, isDisLike, ideaOwner, ideaTitle, isbookmarked, isShare)
+    // Access the item you want to copy (e.g., text)
+    const itemToCopy = "https://dewa.sharepoint.com.mcas.ms/sites/qaideation/SitePages/IdeaInnerPage.aspx?ideaID=" + id;
+
+    // Create a temporary textarea element to perform the copy action
+    const tempTextarea = document.createElement('textarea');
+    tempTextarea.value = itemToCopy;
+    document.body.appendChild(tempTextarea);
+    debugger;
+    // Select and copy the item content
+    tempTextarea.select();
+    document.execCommand('copy');
+
+    // Remove the temporary textarea
+    // document.body.removeChild(tempTextarea);
+    // setTimeout(() => {
+    // document.body.appendChild(tempTextarea)
+    // }, 2000);
+    // Optionally, provide feedback to the user
+    console.log('Link copied to clipboard!');
+    window.location.replace("https://dewa.sharepoint.com.mcas.ms/sites/qaideation/SitePages/Messages.aspx");
+  }
+
+  closeModal() {
+    this.searchText = 'ALL';
+    this.setState({ modalClass: 'modal fade e-backdrop', modalTime: 1 });
+    this.getAllIdeas(0);
+  }
+
+  public onChangeTitle(e: any, selctedOptions: any) {
+    this.setState({
+      Title: selctedOptions,
+    })
+  }
+
+  public redirectShareYourIdea = () => {
+    window.location.replace("https://dewa.sharepoint.com/sites/qaideation/SitePages/ShareYourIdea.aspx?title=" + this.state.Title);
+  }
+
+  handleDownload(url: any) {
+    console.log(url);
+    window.open(url, '_blank');
+  }
+
+  openDropdown() {
+    this.setState({ dropdownClass: 'dropdown-menu show' })
+  }
+
+  public async getEmployeeDetails(prno: any, userno: any) {
+    try {
+      let apiResponse: any;
+      let responseData: any = [];
+      let params =
+      {
+        employeenumber: userno,
+        division: "10003806",
+        usertype: "",
+        taskforce: ""
+      }
+
+      const sK0y = this.state.sK0y;
+      const jString = JSON.stringify(params);
+      const hmacValue = this.generateHMAC(jString, sK0y);
+      // let jtv: any = localStorage.getItem("Jtv");
+      // let jtvparse = JSON.parse(jtv);
+      let headers: any;
+      if (this.state.isHMAC == "Enable") {
+        headers = {
+          'headers': {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'hmac-base64': hmacValue,
+            'Authorization': `Bearer ${this.state.token}`,
+            // 'x-jwt-token': jtvparse.Jtv
+          }
+        };
+      }
+      else {
+        headers = {
+          'headers': {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          }
+        };
+      }
+      console.log("Token:", this.state.token);
+      console.log("Raw User Number:", userno);
+      console.log("Stringified JSON:", JSON.stringify(params));
+      console.log("HMAC:", hmacValue);
+
+      console.log("User Number:", userno, typeof userno);
+      console.log("HMAC Enabled:", this.state.isHMAC);
+      console.log("Final Headers:", headers);
+      console.log("Request Body:", params);
+      console.log("Endpoint:", "employeedetails");
+      apiResponse = await this.IdeationServices.postDataEmployeeDEtails(params, headers, "employeedetails");
+      responseData = apiResponse.data.empdetails[0];
+      console.log("employeedetails", responseData);
+      //return responseData.jobtitle;
+      let List: any;
+      let designation = responseData.jobtitle;
+      let nameEn = responseData.name;
+      let namear = responseData.fullnameinArabic;
+      console.log("designation", designation, prno);
+      List = [];
+      if (this.state.lang == 'en') {
+        List.push({ Ideaowner: userno, designation: designation, name: nameEn, arname: namear })
+      }
+      if (this.state.lang == 'ar') {
+        List.push({ Ideaowner: userno, designation: responseData.jobtitleinArabic, name: namear, arname: namear })
+      }
+      //this.setState({ designationList: List });
+      this.setState((prevState => ({
+        designationList: {
+          ...prevState.designationList,
+          [userno]: List
+        }
+      })));
+      console.log(this.state.designationList);
+      // this.setState({ imageList: [] });
+    }
+    catch (ex) {
+      //console.log(ex);
+      console.log("Error fetching employee details for", userno, ex);
+    }
+  }
+
+  seeOrginal(text: any, ideaId: any, index: any, orgboo: any, by: any, commentid: any = 0) {
+    let org = orgboo == true ? false : true;
+    debugger;
+    if (by == "byidea") {
+      this.setState((prevState) => ({
+        allIdeaList: prevState.allIdeaList.map((item: any) =>
+          item.ideaid === ideaId
+            ? {
+              ...item, //translatedText: text,
+              // ideatitle: item.translatedText,
+              original: org
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+      console.log(this.state.allIdeaList);
+    }
+
+    if (by == "bycomments") {
+      this.setState((prevState) => ({
+        commentList: prevState.commentList.map((item: any) =>
+          item.ideaid == ideaId && item.commentid == commentid
+            ? {
+              ...item, //translatedText: text,
+              // comments: item.translatedText,
+              original: true
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+      this.setState((prevState) => ({
+        allCommentList: prevState.allCommentList.map((item: any) =>
+          item.ideaid == ideaId && item.commentid == commentid
+            ? {
+              ...item, //translatedText: text,
+              //comments: item.translatedText,
+              original: true
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+      console.log(this.state.allCommentList);
+    }
+
+  }
+  public async callPowerAutomateForTranslate(text: any, ideaId: any, index: any, orgboo: any, by: any, commentid: any = 0) {
+    try {
+      debugger;
+
+
+      let url: any = "";
+
+      // url = `https://prod-07.uaenorth.logic.azure.com:443/workflows/a2140ce371ed41b79bac3f97ac365e26/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FtsywPVNPhaamUrExr9mOy2Bf9BbyzKVoBLAk8WBM58&text=${text}`;
+      url = `https://prod-07.uaenorth.logic.azure.com/workflows/a2140ce371ed41b79bac3f97ac365e26/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FtsywPVNPhaamUrExr9mOy2Bf9BbyzKVoBLAk8WBM58&text=${text}`;
+      // Make the GET request
+      const resp = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(resp);
+
+      // Check if the request was successful
+      if (resp.ok) {
+        const result = await resp.json();
+        // alert("Successfully Flow triggered");
+        console.log(result);
+        let org = orgboo == true ? false : true;
+        // Now, update the state to reflect the changes
+        if (by == "byidea") {
+          this.setState((prevState) => ({
+            allIdeaList: prevState.allIdeaList.map((item: any) =>
+              item.ideaid === ideaId
+                // ? {
+                //   ...item, translatedText: text,
+                //   ideatitle: result.translatedText,
+                //   original: org
+                // } // Add translatedText for the matched item
+                // : item // Keep the other items unchanged
+
+                ? {
+                  ...item, translatedText: result.translatedText,
+                  // ideatitle: result.translatedText,
+                  original: org
+                } // Add translatedText for the matched item
+                : item // Keep the other items unchanged
+            )
+          }));
+          console.log(this.state.allIdeaList);
+        }
+
+        if (by == "bycomments") {
+          this.setState((prevState) => ({
+            commentList: prevState.commentList.map((item: any) =>
+              item.ideaid == ideaId && item.commentid == commentid
+                ? {
+                  ...item, translatedText: result.translatedText,
+                  //comments: result.translatedText,
+                  original: org
+                } // Add translatedText for the matched item
+                : item // Keep the other items unchanged
+            )
+          }));
+          this.setState((prevState) => ({
+            allCommentList: prevState.allCommentList.map((item: any) =>
+              item.ideaid === ideaId && item.commentid === commentid
+                ? {
+                  ...item, translatedText: result.translatedText,
+                  //comments: result.translatedText,
+                  original: org
+                } // Add translatedText for the matched item
+                : item // Keep the other items unchanged
+            )
+          }));
+          // this.setState(prevState => ({
+          //   commentList: this.initialComments,
+          //   isCommentLoadMore: this.isCommentMoreTwo,
+          //   allCommentList: this.commentdatalist,
+          //   comment: ""  }));
+          console.log("commentList", this.state.commentList);
+        }
+
+      } else {
+        // Handle HTTP error status
+        console.error(`Error: ${resp.status} - ${resp.statusText}`);
+      }
+
+      //console.log(userEmailID);
+    } catch (error) {
+      // Handle other errors
+      console.error("Error:", error);
+    }
+  }
+
+  changeLanguage() {
+    const body = document.body;
+    body.classList.remove(this.globalClass);
+    let lang: any = localStorage.getItem('lang');
+    if (lang) {
+      let parsedlang = JSON.parse(lang);
+      if (parsedlang.lang && parsedlang.lang == "ar") {
+        this.setState({
+          class: "afkhome-ar", lang: "ar", addedtoyourbookmarks: ' تمت الإضافة إلى العلامات المرجعية الخاصة بك ', Recent: 'حديث', bookmarksremoved: 'تمت إزالة العلامات المرجعية',
+          recent: 'حديث', implemented: 'تنفيذ', latestsubmissions: 'آخر تقديم', oldsubmissions: 'التقديمات القديمة', mostliked: 'الأكثر إعجابا', mostcomments: 'معظم التعليقات', onlyyouractivity: 'نشاطك فقط'
+          // errorMessage: 'رسالة خطأ',hasBeen: 'تم ', byYOu: ' بواسطتك.', successfully: 'تم التقديم بنجاح',
+          // successMessage: 'رسالة نجاح', unableTo: 'غير قادرعلى', tryAgainlater: 'تعذر الإرسال. يرجى المحاولة مرة أخرى لاحقا.',
+        });
+        this.globalClass = "global-ar"
+        body.classList.add('global-ar');
+        this.langCode = 14337;
+        // this.getMyIdea();
+        // this.getIdeaApproval();
+        // this.GetEmployeeDetails();
+        // this.getProcessListValues();
+      }
+      else {
+        this.setState({
+          class: "afkhome-en", lang: "en", addedtoyourbookmarks: 'Added to your Bookmarks', Recent: 'Recent', bookmarksremoved: 'Bookmarks Removed',
+          recent: 'Recent', implemented: 'Implemented', latestsubmissions: 'Latest Submissions', oldsubmissions: 'Old Submissions', mostliked: 'Most Liked', mostcomments: 'Most Comments', onlyyouractivity: 'Only your activity'
+          //  errorMessage: 'Error Message', hasBeen: ' has been', byYOu: 'By you.', successfully: 'Submitted Successfully.',
+          // successMessage: 'Success Message', unableTo: 'Unable to', tryAgainlater: 'Unable to Submit. Please try again later.',
+        });
+        this.globalClass = "global-en"
+        body.classList.add('global-en');
+        this.langCode = 1033;
+        // this.getMyIdea();
+        // this.getIdeaApproval();
+        // this.GetEmployeeDetails();
+        // this.getProcessListValues();
+      }
+    } else {
+      this.setState({
+        class: "afkhome-en", lang: "en", addedtoyourbookmarks: 'Added to your Bookmarks', Recent: 'Recent', bookmarksremoved: 'Bookmarks Removed',
+        recent: 'Recent', implemented: 'Implemented', latestsubmissions: 'Latest Submissions', oldsubmissions: 'Old Submissions', mostliked: 'Most Liked', mostcomments: 'Most Comments', onlyyouractivity: 'Only your activity'
+        // errorMessage: 'Error Message', hasBeen: ' has been', byYOu: 'By you.', successfully: 'Submitted Successfully.',
+        // successMessage: 'Success Message', unableTo: 'Unable to', tryAgainlater: 'Unable to Submit. Please try again later.',
+      });
+      this.globalClass = "global-en"
+      body.classList.add('global-en');
+      this.langCode = 1033;
+      // this.getMyIdea();
+      // this.getIdeaApproval();
+      // this.GetEmployeeDetails();
+      // this.getProcessListValues();
+    }
+
+  }
+
+
+  public render(): React.ReactElement<IAfkHomeProps> {
+    // const langText = this.state.lang === "en" ? en : ar;
+    const langText = this.state.lang === "en" ? this.state.englishContent : this.state.arabicContent;
+
+    return (
+      <section>
+        <div className="col-lg-12 afk-home">
+          <div className={this.state.class}>
+            <div>
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="d-flex h-border-box h-top-box">
+                    <div className="flex-shrink-0">
+                      {this.userImageUrl != '' && (
+                        <img
+                          className="profile-img02"
+                          src={this.userImageUrl}
+                          alt="user pic"
+                        />)}
+                      {this.userImageUrl == '' && (
+                        <img
+                          className="profile-img02"
+                          src={DummyProfileimg}
+                          alt="user pic"
+                        />)}
+                    </div>
+                    <div className="flex-grow-1 ms-3 d-flex flex-column justify-content-center">
+                      <h5 className="grey-text align-middle">
+                        <TextField style={{ "backgroundColor": "white" }}
+                          value={this.state.Title}
+                          placeholder={langText.inspirechange}
+                          onChange={(e, newValue) => this.onChangeTitle(e, newValue)} >
+                        </TextField>
+
+
+
+                      </h5>
+                      <div className="ei-right">
+                        <a onClick={() => this.redirectShareYourIdea()}>
+                          <img
+                            src={Editicon}
+                            alt="edit-icon"
+                            width="16"
+                            height="17"
+                          />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/*<div className="col-lg-12">
+                  <div className="clearfix">
+                    <div className="float-start">
+                      <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                        <img
+                          src={Voteicon}
+                          alt="vote-icon"
+                          width="20"
+                          height="20"
+                        />
+                        <span className="ms-2">Vote</span>
+                      </p>
+
+                      <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                        <img
+                          src={Commenticon}
+                          alt="comment-icon"
+                          width="20"
+                          height="20"
+                        />
+                        <span className="ms-2">Comment</span>
+                      </p>
+
+                      <p className="vcs-text-dark float-start mb-0 cursor-pointer share-drop">
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-primary dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <img
+                              src={Shareicon}
+                              alt="share-icon"
+                              width="20"
+                              height="20"
+                            />
+                            <span className="ms-2">Share</span>
+                          </button>
+                          <div className="dropdown-menu">
+                            <a className="dropdown-item" href="#">
+                              <img
+                                src={Sharecopylinkicon}
+                                alt="copy-link-icon"
+                                width="24"
+                                height="24"
+                              />
+                              <span className="ms-2">Copy Link</span>
+                            </a>
+                            <hr className="dropdown-divider" role="separator" />
+                            <a className="dropdown-item" href="#">
+                              <img
+                                src={Sharesenddirectlinkicon}
+                                alt="send-direct-icon"
+                                width="24"
+                                height="24"
+                              />
+                              <span className="ms-2">Send via Direct Message</span>
+                            </a>
+                          </div>
+                        </div>
+                      </p>
+                    </div>
+                  </div>
+                </div>*/}
+
+              </div>
+
+
+
+
+              <div
+
+                className={this.state.modalClass}
+                id="nodataModal"
+
+              >
+                <div className="modal-dialog modal-90w">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      {/* <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1> */}
+                      <button
+                        type="button"
+                        className="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                        onClick={() => this.closeModal()}
+                      ></button>
+                    </div>
+                    <div className="modal-body">
+                      <div className="row">
+                        <div className="col-lg-12 text-center mb-3">
+                          <img
+                            src={MIe02}
+                            className="mins-icon"
+                            alt="edit-icon"
+                            width="48"
+                            height="48"
+                          />
+                        </div>
+                        <div className="col-lg-12">
+                          <h1 className="moheading01">{langText.nodataavailable}</h1>
+                          {/* <p className="motext01">
+                        You have no data in this page
+                      </p> */}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="modal-footer justify-content-center">
+                      <a
+
+                        type="button"
+                        className="btn btn-danger m-btn"
+                        onClick={() => this.closeModal()}
+                      >
+                        {langText.ok}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-lg-12 position-relative">
+                  <hr className="border-topr" />
+                  <div className="small-drop">
+                    <div className="dropdown drop-white-space d-flex align-items-center">
+                      {langText.sortby}
+                      <a
+                        className="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        id="dropdownMenuButtonsmalldrop"
+                        onClick={() => this.openDropdown()}
+                      >
+                        <strong>{this.state.filterWithCase}</strong>
+                        <div className={this.state.dropdownClass} aria-labelledby="dropdownMenuButtonsmalldrop">
+                          <a onClick={() => this.getAllIdeas(0, "", this.state.recent)} className="dropdown-item" href="#">
+                            {" "}
+                            {langText.recent}
+                          </a>
+                          <hr className="dropdown-divider" role="separator" />
+                          <a onClick={() => this.getAllIdeas(0, "IMPLEMENTED", this.state.implemented)} className="dropdown-item" href="#">
+                            {" "}
+                            {langText.implemented}
+                          </a>
+                          <hr className="dropdown-divider" role="separator" />
+                          <a onClick={() => this.getAllIdeas(0, "LATEST SUBMISSIONS", this.state.latestsubmissions)} className="dropdown-item" href="#">
+                            {" "}
+                            {langText.latestsubmissions}
+                          </a>
+                          <hr className="dropdown-divider" role="separator" />
+                          <a onClick={() => this.getAllIdeas(0, "OLD SUBMISSIONS", this.state.oldsubmissions)} className="dropdown-item" href="#">
+                            {" "}
+                            {langText.oldsubmissions}
+                          </a>
+                          <hr className="dropdown-divider" role="separator" />
+                          <a onClick={() => this.getAllIdeas(0, "MOST LIKED", this.state.mostliked)} className="dropdown-item" href="#">
+                            {" "}
+                            {langText.mostliked}
+                          </a>
+                          <hr className="dropdown-divider" role="separator" />
+                          <a onClick={() => this.getAllIdeas(0, "MOST COMMENTS", this.state.mostcomments)} className="dropdown-item" href="#">
+                            {" "}
+                            {langText.mostcomments}
+                          </a>
+                          <hr className="dropdown-divider" role="separator" />
+                          <a onClick={() => this.getmyideas(0, "Only your activity", this.state.onlyyouractivity)} className="dropdown-item" href="#">
+                            {" "}
+                            {langText.onlyyouractivity}
+                          </a>
+                        </div>
+                      </a>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+
+                <div>
+                  {/* <div className="row mt-4">
+                  <div className="col-lg-12 position-relative">
+                    <div className="h-border-box-outline-doc">
+                      <div className="col-lg-12 p16">
+                        <div className="col-lg-12 p-0">
+                          <div className="d-flex">
+                            <div className="flex-shrink-0">
+                              <img
+                                className="profile-img03"
+                                src={ProfileImg07}
+                                alt="user pic"
+                              />
+                            </div>
+                            <div className="flex-grow-1 ms-3">
+                              <h4 className="profile-name-text01">Dylan Field</h4>
+                              <h5 className="grey-text02">
+                                Sr Specialist - Investments
+                              </h5>
+                              <h5 className="grey-text02">
+                                <img
+                                  src={Globeicon}
+                                  alt="edit-icon"
+                                  width="12"
+                                  height="12"
+                                  className="float-start mt-1-5"
+                                />
+                                <span className="ms-2 mt-1 float-start">Nov 23</span>{" "}
+                                <span className="mt-1 float-start">
+                                  .ID: 2023-13111
+                                </span>
+                              </h5>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-lg-12 p-0">
+                          <h3 className="h-idea-heading mt-4">
+                            Residential Solar Solutions: Harnessing Clean Energy for
+                            Homes.
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="col-lg-12 p-0">
+                        <img
+                          className="img-fluid mt-1 banner-doc-img"
+                          src={HomeBanner09}
+                          alt="banner pic"
+                        />
+                      </div>
+                      <div className="col-lg-12 p-0">
+                        <div className="grey-box-doc">
+                          <h3 className="h-idea-heading mb-0">
+                            Residential Solar Solutions: Harnessing Clean Energy for
+                            Homes. Top 10 thing you need to know
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="col-lg-12 p-0">
+                        <div className="row justify-content-center">
+                          <p className="col-4 vcs-text-dark text-center mt-3  mb-0 cursor-pointer">
+                            <img
+                              src={Downloadicon}
+
+                              alt="edit-icon"
+                              width="20"
+                              height="20"
+                            />
+                            <span className="ms-2 text-green" onClick={() => this.handleDownload('url')}>Download</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-12 p16 pt-0">
+                        <div className="col-lg-12">
+                          <hr className="border-topr" />
+                        </div>
+
+                        <div className="col-lg-12">
+                          <div className="clearfix">
+                            <div className="float-end">
+                              <p className="vcs-text me-3 float-start mb-0">144 Vote</p>
+                              <p className="vcs-text me-3 float-start mb-0">
+                                201 Comments
+                              </p>
+                              <p className="vcs-text float-start mb-0">30 Shares</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-lg-12">
+                          <hr className="border-topr" />
+                        </div>
+
+                        <div className="col-lg-12">
+                          <div className="clearfix">
+                            <div className="float-start">
+                              <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                                <img
+                                  // src={Votegreenicon}
+                                  src={Commenticon}
+                                  alt="edit-icon"
+                                  width="20"
+                                  height="20"
+                                />
+                                <span className="ms-2 text-green">Vote</span>
+                              </p>
+                              <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                                <img
+                                  src={Commenticon}
+                                  alt="edit-icon"
+                                  width="20"
+                                  height="20"
+                                />
+                                <span className="ms-2">Comment</span>
+                              </p>
+                              <p className="vcs-text-dark float-start mb-0 cursor-pointer share-drop">
+                                <div className="dropdown">
+                                  <button
+                                    className="btn btn-primary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                  >
+                                    <img
+                                      src={Shareicon}
+                                      alt="edit-icon"
+                                      width="20"
+                                      height="20"
+                                    />
+                                    <span className="ms-2">Share</span>
+                                  </button>
+                                  <div className="dropdown-menu">
+                                    <a className="dropdown-item" href="#">
+                                      <img
+                                        src={Sharecopylinkicon}
+                                        alt="edit-icon"
+                                        width="24"
+                                        height="24"
+                                      />
+                                      <span className="ms-2">Copy Link</span>
+                                    </a>
+                                    <hr className="dropdown-divider" role="separator" />
+                                    <a className="dropdown-item" href="#">
+                                      <img
+                                        src={Sharesenddirectlinkicon}
+                                        alt="edit-icon"
+                                        width="24"
+                                        height="24"
+                                      />
+                                      <span className="ms-2">
+                                        {" "}
+                                        Send via Direct Message
+                                      </span>
+                                    </a>
+                                  </div>
+                                </div>
+                              </p>
+                            </div>
+                            <div className="float-end">
+                              <p className="vcs-text float-start mb-0 cursor-pointer" data-tip
+                                data-for="BookmarkTip">
+
+                                <a
+                                  href=""
+                                  className="bookmarks-icon"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#Bookmarkmodal"
+                                />
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div className="row mt-4">
+                  <div className="col-lg-12 position-relative">
+                    <div className="h-border-box-outline">
+                      <div className="col-lg-12 p-0">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0">
+                            <img
+                              className="profile-img03"
+                              src={ProfileImg08}
+                              alt="user pic"
+                            />
+                          </div>
+                          <div className="flex-grow-1 ms-3">
+                            <div className="row">
+                              <div className="col-lg-8">
+                                <h4 className="profile-name-text01">Steve Marron</h4>
+                                <h5 className="grey-text02">
+                                  Sr Specialist - Investments
+                                </h5>
+                                <h5 className="grey-text02">
+                                  <img
+                                    src={Globeicon}
+                                    alt="edit-icon"
+                                    width="12"
+                                    height="12"
+                                    className="float-start mt-1-5"
+                                  />
+                                  <span className="ms-2 mt-1 float-start">Nov 23</span>{" "}
+                                  <span className="mt-1 float-start">
+                                    .ID: 2023-13111
+                                  </span>
+                                </h5>
+                              </div>
+                              <div className="col-lg-4">
+                                <div className="float-end">
+
+                                  <button className="tt-a">
+                                    <span className="cursor-pointer badge rounded-pill text-dark bg-success">
+                                      <img
+                                        src={Implementedthumbsicon}
+
+                                        alt="edit-icon"
+                                        width="14"
+                                        height="14"
+                                      />
+                                      <span className="ms-1">
+                                        <a className="" href="#">
+                                          Implemented
+                                        </a>
+                                      </span>
+                                    </span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-lg-12 p-0">
+                        <h3 className="h-idea-heading mt-4">
+                          New combined Solar Permits & Connection applications.
+                        </h3>
+                      </div>
+                      <div className="col-lg-12 p-0">
+                        <div className="player-wrapper">
+
+                          <ReactPlayer
+                            url="https://www.youtube.com/watch?v=LXb3EKWsInQ"
+                            width="100%"
+                            height="100%"
+                            controls={true}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-lg-12">
+                        <hr className="border-topr" />
+                      </div>
+
+                      <div className="col-lg-12">
+                        <div className="clearfix">
+                          <div className="float-end">
+                            <p className="vcs-text me-3 float-start mb-0">144 Vote</p>
+                            <p className="vcs-text me-3 float-start mb-0">
+                              201 Comments
+                            </p>
+                            <p className="vcs-text float-start mb-0">30 Shares</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12">
+                        <hr className="border-topr" />
+                      </div>
+
+                      <div className="col-lg-12">
+                        <div className="clearfix">
+                          <div className="float-start">
+                            <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                              <div className="vote-icon">
+                                <span>Vote</span>
+                              </div>
+                            </p>
+
+                            <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                              <img
+                                src={Commenticon}
+                                alt="edit-icon"
+                                width="20"
+                                height="20"
+                              />
+                              <span className="ms-2">Comment</span>
+                            </p>
+
+                            <p className="vcs-text-dark float-start mb-0 cursor-pointer share-drop">
+                              <div className="dropdown">
+                                <button
+                                  className="btn btn-primary dropdown-toggle"
+                                  type="button"
+                                  data-bs-toggle="dropdown"
+                                  aria-expanded="false"
+                                >
+                                  <img
+                                    src={Shareicon}
+                                    alt="edit-icon"
+                                    width="20"
+                                    height="20"
+                                  />
+                                  <span className="ms-2">Share</span>
+                                </button>
+                                <div className="dropdown-menu">
+                                  <a className="dropdown-item" href="#">
+                                    <img
+                                      src={Sharecopylinkicon}
+                                      alt="edit-icon"
+                                      width="24"
+                                      height="24"
+                                    />
+                                    <span className="ms-2">Copy Link</span>
+                                  </a>
+                                  <hr className="dropdown-divider" role="separator" />
+                                  <a className="dropdown-item" href="#">
+                                    <img
+                                      src={Sharesenddirectlinkicon}
+                                      alt="edit-icon"
+                                      width="24"
+                                      height="24"
+                                    />
+                                    <span className="ms-2">
+                                      {" "}
+                                      Send via Direct Message
+                                    </span>
+                                  </a>
+                                </div>
+                              </div>
+                            </p>
+                          </div>
+                          <div className="float-end">
+                            <p
+                              className="vcs-text float-start mb-0 cursor-pointer"
+                              data-tip
+                              data-for="BookmarkTip"
+                            >
+
+                              <a
+                                href=""
+                                className="bookmarks-icon"
+                                data-bs-toggle="modal"
+                                data-bs-target="#Bookmarkmodal"
+                              />
+                            </p>
+                            <ReactTooltip id="BookmarkTip" place="top" effect="solid">
+                              Bookmark
+                            </ReactTooltip>
+                            <ReactTooltip id="RemoveBookmarkTip" place="top" effect="solid">
+                              Remove Bookmark
+                            </ReactTooltip>
+                            <ReactTooltip id="ViewCampaignTip" place="top" effect="solid">
+                              View Campaign
+                            </ReactTooltip>
+                          </div>
+
+                          <div
+                            className="modal fade"
+                            id="Bookmarkmodal"
+                            aria-labelledby="BookmarkmodalLabel"
+                            aria-hidden="true"
+                            data-backdrop="false"
+                          >
+                            <div className="modal-dialog modal-tw">
+                              <div className="modal-content">
+                                <div className="modal-body">
+                                  <div className="row">
+                                    <div className="col-lg-12">
+                                      <div className="toast-body">
+                                        <div className="clearfix">
+                                          <img
+                                            src={Bookmarkiconwhite}
+                                            className="float-start me-2"
+                                            alt="edit-icon"
+                                            width="20"
+                                            height="20"
+                                          />
+                                          <p className="float-start mb-0 me-2">
+                                            Added to your Bookmarks
+                                          </p>
+                                          <a
+                                            className="float-end tb-link"
+                                            href="https://dewa.sharepoint.com/sites/qaideation/SitePages/Bookmarks.aspx"
+                                          >
+                                            View
+                                          </a>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> */}
+                  {this.state.allIdeaList.map((item: any, index: any) => (
+                    <div className="row posted-ideas" key={item.ideaid}  >
+                      {/* <a
+            //   href="https://dewa.sharepoint.com/sites/qaideation/SitePages/Notifications.aspx"
+            // ></a> */}
+                      <div className="col-lg-12 position-relative">
+                        <a className="section-box-link">
+                          <div className="h-border-box-outline mt-4">
+                            <div className="col-lg-12 p-0 cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
+                              <div className="d-flex">
+                                <div className="flex-shrink-0">
+
+
+                                  {this.state.profileAttachments[item.ideaowner] && this.state.profileAttachments[item.ideaowner].map((attachment: profileAttachment) => (
+                                    <img
+                                      className="profile-img03"
+                                      src={attachment.imageUrl}
+                                      alt="user pic"
+                                    />))}
+                                </div>
+                                <div className="flex-grow-1 ms-3">
+                                  {this.state.designationList[item.ideaowner] && this.state.designationList[item.ideaowner].map((item: userDesignation) => (
+                                    <h4 className="profile-name-text01">{item.name}</h4>
+                                  ))}
+                                  {this.state.designationList[item.ideaowner] && this.state.designationList[item.ideaowner].map((item: userDesignation) => (
+                                    <h5 className="grey-text02">
+                                      {item.designation}
+                                    </h5>))}
+                                  <h5 className="grey-text02">
+                                    <img
+                                      src={Globeicon}
+                                      alt="edit-icon"
+                                      width="12"
+                                      height="12"
+                                      className="float-start mt-1-5"
+                                    />
+                                    <span className="ms-2 mt-1 float-start">{this.formatDate(item.enteredon)}</span>{" "}
+                                    {/* <span className="mt-1 float-start">
+                                    .ID:{item.ideaid}
+                                  </span> */}
+                                  </h5>
+                                </div>
+                              </div>
+                            </div>
+                            {/* onClick={() => this.redirectInnerPage(item.ideaid)} */}
+                            <div className="col-lg-12 p-0 cursor-pointer" >
+                              <h3 className="h-idea-heading">
+                                <span className='rcs-text' onClick={() => this.redirectInnerPage(item.ideaid)}>{item.ideatitle}</span>
+                                {item.original && (
+                                  <span className='trans-text' onClick={() => this.callPowerAutomateForTranslate(item.ideatitle, item.ideaid, index, item.original, "byidea")}>{langText.seetranslation}</span>)}
+                                <br />
+                                {!item.original && (
+                                  <><span className='rcs-text'>{item.translatedText}</span><span className='trans-text' onClick={() => this.seeOrginal(item.ideatitle, item.ideaid, index, item.original, "byidea")}>{langText.seeoriginal}</span></>)}
+                              </h3>
+                            </div>
+                            <div className="col-lg-12 p-0 cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
+                              <ul className='himage-gallery'>
+
+                                {/* {(await this.getAttachmentById(item.ideaid)).map((imageURL: any, index: any) => ( */}
+                                {/* {this.getImageURL(item.ideaid).map((imageURL: any, index: any) => (
+                                <li>
+                                  <img key={index} src={imageURL} alt={`Image ${index + 1}`} className="img-fluid mt-1 banner-img" />
+                                </li>
+                              ))} */}
+                                {this.state.attachments[item.ideaid] && this.state.attachments[item.ideaid].map((attachment: any) => (
+                                  <>
+                                    {attachment.map((attachment: any) => (
+
+                                      <li>
+                                        {attachment.imageUrl != '' && (
+                                          <img key={attachment.imageUrl} src={attachment.imageUrl} alt="attachment" />
+                                        )}
+
+                                        {attachment.videoUrl != '' && (
+
+                                          <ReactPlayer
+                                            url={attachment.videoUrl}
+                                            width="100%"
+                                            height="100%"
+                                            controls={true}
+                                          />
+
+                                        )}
+                                      </li>
+
+                                    ))} </>
+                                ))}
+
+                              </ul>
+                            </div>
+                            {/* download icon comes here */}
+                            <div className="col-lg-12">
+                              <ul className='download-sec-container'>
+                                {this.state.attachments[item.ideaid] && this.state.attachments[item.ideaid].map((attachment: any) => (
+                                  <>
+                                    {attachment.map((attachment: any) => (
+                                      <li>
+                                        {attachment.pdfUrl != '' && (
+                                          <>
+                                            {/* <img src={hbanner10} alt="attachment" /> */}
+                                            <div className="col-lg-12 p-0 download-btn-section">
+                                              <div className="row justify-content-center">
+                                                <p className="col-4 vcs-text-dark text-center mt-3  mb-0 cursor-pointer">
+                                                  <img
+                                                    src={Downloadicon}
+                                                    //src={hbanner10}
+                                                    alt="edit-icon"
+                                                    width="20"
+                                                    height="20"
+                                                    className='downloadicon-img'
+                                                  />
+                                                  <span className="ms-2 text-green" onClick={() => this.handleDownload(attachment.pdfUrl)}>{langText.download}</span>
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </>
+                                        )}
+                                      </li>
+                                    ))}
+                                  </>
+
+                                ))}
+                              </ul>
+                            </div>
+                            {/* download icon comes here */}
+
+
+                            {/* <div className="col-lg-12">
+                              <hr className="border-topr" />
+                            </div> */}
+
+                            {/* <div className="col-lg-12">
+                              <div className="clearfix">
+                                <div className="float-end">
+                                  {item.votecnt < 2 && (
+                                     <p className="vcs-text me-3 float-start mb-0"> {item.votecnt} vote</p>
+                                   )}
+                                  {item.votecnt >= 2 && (
+                                   <p className="vcs-text me-3 float-start mb-0"> {item.votecnt} votes</p>)}
+                                  {item.commentcnt < 2 && (
+                                    <p className="vcs-text me-3 float-start mb-0">
+                                      {item.commentcnt} {langText.comment}
+                                    </p>)}
+                                  {item.commentcnt >= 2 && (
+                                    <p className="vcs-text me-3 float-start mb-0">
+                                      {item.commentcnt} {langText.comment}
+                                    </p>)}
+                                  {item.sharecnt < 2 && (
+                                    <p className="vcs-text float-start mb-0"> {item.sharecnt} {langText.share}</p>)}
+                                  {item.sharecnt >= 2 && (
+                                    <p className="vcs-text float-start mb-0"> {item.sharecnt} {langText.shares}</p>)}
+                                </div>
+                              </div>
+                            </div> */}
+
+                            <div className="col-lg-12">
+                              <hr className="border-topr" />
+                            </div>
+
+                            <div className="col-lg-12">
+                              <div className="clearfix">
+                                <div className="float-start">
+                                  {/* {this.loggedInUser != item.submitteremailid &&(
+                               <div> */}
+                                  {item.uservote == "0" && (
+                                    <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                                      {this.loggedInUser.toLowerCase() != item.submitteremailid.toLowerCase() && (
+                                        <div onClick={() => this.submitVote(item.ideaid, "1", "0", item.enteredby, item.ideatitle, item.userbookmark, 0
+                                        )} className="vote-icon">
+                                          {/*} <span className="votechanging">{langText.vote}</span>*/}
+                                          <span className="votechanging">vote ({item.votecnt})</span>
+                                        </div>)}
+                                    </p>
+                                  )}
+                                  {item.uservote == "1" && (
+                                    <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+
+                                      {this.loggedInUser.toLowerCase() != item.submitteremailid.toLowerCase() && (<div onClick={() => this.submitVote(item.ideaid, "0", "1", item.enteredby, item.ideatitle, item.userbookmark, 0)} className="vote-green-icon">
+                                        <span className="votechanging">vote ({item.votecnt})</span>
+                                      </div>)}
+                                    </p>
+                                  )}
+                                  {/* </div> )} */}
+                                  <p onClick={() => this.toggleCommentShow(item.ideaid)} className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                                    <img
+                                      src={Commenticon}
+                                      alt="edit-icon"
+                                      width="20"
+                                      height="20"
+                                    />
+                                    {/*} <span className="ms-2">{langText.comment}</span>*/}
+                                    <span className="ms-2">Comment ({item.commentcnt})</span>
+                                  </p>
+                                  <p className="vcs-text-dark float-start mb-0 cursor-pointer share-drop">
+                                    <div className="dropdown">
+                                      <a
+                                        className="btn btn-primary dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                      >
+                                        <img
+                                          src={Shareicon}
+                                          alt="edit-icon"
+                                          width="20"
+                                          height="20"
+                                        />
+                                        {/*<span className="ms-2">{langText.share}</span>*/}
+                                        <span className="ms-2">share ({item.sharecnt})</span>
+                                        <div className="dropdown-menu">
+                                          <a className="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#Linkcopiedmodal">
+                                            <img
+                                              src={Sharecopylinkicon}
+                                              alt="edit-icon"
+                                              width="24"
+                                              height="24"
+                                            />
+                                            <span className="ms-2" onClick={() => this.handleCopy(item.ideaid, item.uservote, !item.uservote, item.ideaowner, item.ideatitle, item.userbookmark, 1)}>{langText.copylink}</span>
+                                          </a>
+                                          <hr className="dropdown-divider" role="separator" />
+                                          <a className="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#DirectMessageSentmodal">
+                                            <img
+                                              src={Sharesenddirectlinkicon}
+                                              alt="edit-icon"
+                                              width="24"
+                                              height="24"
+                                            />
+                                            <span className="ms-2" onClick={() => this.redirectToMessage(item.ideaid, item.uservote, !item.uservote, item.ideaowner, item.ideatitle, item.userbookmark, 1)}>
+                                              {" "}
+                                              {langText.sendviadirectmessage}
+                                            </span>
+                                          </a>
+                                        </div>
+                                      </a>
+
+                                    </div>
+                                  </p>
+                                </div>
+                                <div className="float-end">
+                                  {item.userbookmark == "0" && (
+                                    <p className="vcs-text float-start mb-0 cursor-pointer" data-tip
+                                      data-for="BookmarkTip">
+                                      <a
+                                        className="bookmarks-icon"
+                                        onClick={() => this.submitBookmark(item.ideaid, 1, 0, 1)}
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#Bookmarkmodal"
+                                      />
+                                    </p>
+                                  )}
+                                  {item.userbookmark == "1" && (
+                                    <p className="vcs-text float-start mb-0 cursor-pointer" data-tip
+                                      data-for="RemoveBookmarkTip">
+                                      <a
+                                        className="bookmarks-icon-black"
+                                        onClick={() => this.submitBookmark(item.ideaid, 0, 1, 0)}
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#Bookmarkmodal"
+                                      />
+                                    </p>
+                                  )}
+                                  {item.userbookmark == "0" && (
+                                    <ReactTooltip id="BookmarkTip" place="top" effect="solid">
+                                      {langText.bookmark}
+                                    </ReactTooltip>)}
+                                  {item.userbookmark == "1" && (
+                                    <ReactTooltip id="RemoveBookmarkTip" place="top" effect="solid">
+                                      {langText.removebookmark}
+                                    </ReactTooltip>)}
+                                  <ReactTooltip id="ViewCampaignTip" place="top" effect="solid">
+                                    {langText.viewcampaign}
+                                  </ReactTooltip>
+                                </div>
+                              </div>
+                            </div>
+
+
+                            {this.state.isCommentShow[item.ideaid] && (
+                              <div>
+                                {/* {item.submitteremailid != this.loggedInUser && ( */}
+                                <div className="col-lg-12 input-with-img">
+                                  <div className="mb-3 mt-4 input-group">
+                                    <span className="input-group-text" id="basic-addon1">
+                                      {this.userImageUrl != '' && (
+
+                                        <img
+                                          className="profile-img02"
+                                          src={this.userImageUrl}
+                                          alt="user pic"
+                                        />)}
+                                      {this.userImageUrl == '' && (
+
+                                        <img
+                                          className="profile-img02"
+                                          src={DummyProfileimg}
+                                          alt="user pic"
+                                        />)}
+                                    </span>
+
+                                    <TextField
+                                      placeholder={langText.shareyourthouhtshome}
+                                      className="form-control"
+                                      value={this.state.comment}
+                                      onChange={(e, newValue) =>
+                                        this.onChangeComment(e, newValue)
+                                      }
+                                      onKeyPress={(e) => this.handleKeyPress(e, item.ideaid, item.ideatitle, item.ideaowner)}
+                                    />
+                                  </div>
+                                </div>
+                                {/* )} */}
+                                {console.log("comments list", this.state.commentList)};
+                                {this.currentCommentId == item.ideaid && this.state.commentList.map((commentItem: any) => (
+
+                                  <div className="col-lg-12 position-relative" key={commentItem.commentid}>
+                                    <div className="h-border-box-reply">
+                                      <div className="col-lg-12 p-0">
+                                        <div className="d-flex">
+                                          <div className="flex-shrink-0">
+                                            {this.state.profileAttachments[commentItem.submitteremailid] && this.state.profileAttachments[commentItem.submitteremailid].map((attachment: profileAttachment) => (
+
+                                              <img
+                                                className="profile-img04"
+                                                src={attachment.imageUrl}
+                                                alt="user pic"
+                                              />))}
+
+                                          </div>
+                                          <div className="flex-grow-1 ms-2">
+                                            <div className="row">
+                                              <div className="col-lg-8">
+                                                {console.log("Comment email:", commentItem.submitteremailid)}
+                                                {console.log("designationList entry:", this.state.designationList[commentItem.submitteremailid])}
+                                                {this.state.designationList[commentItem.submitteremailid] && this.state.designationList[commentItem.submitteremailid].map((item: userDesignation) => (
+                                                  <h4 className="profile-name-text02 03testing">
+                                                    {item.name}
+                                                  </h4>))}
+                                                {this.state.designationList[commentItem.submitteremailid] && this.state.designationList[commentItem.submitteremailid].map((item: userDesignation) => (
+                                                  <h5 className="grey-text03">
+                                                    {item.designation}
+                                                  </h5>))}
+                                              </div>
+                                              <div className="col-lg-4">
+                                                <div className="float-end">
+                                                  {/* <h5 className="grey-text03  float-start">{this.formatTimeElapsed(commentItem.enteredon)}</h5> */}
+                                                  <h5 className="grey-text03  float-start"> {this.formatDate(commentItem.enteredon)}</h5>
+                                                  <div className="small-drop-e float-start">
+                                                    <div className="dropdown">
+                                                      <a
+                                                        className="btn btn-secondary dropdown-toggle"
+                                                        type="button"
+                                                        data-bs-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                      >
+                                                        <img
+                                                          src={Replyellipsesicon}
+                                                          alt="edit-icon"
+                                                          width="24"
+                                                          height="24"
+                                                        />
+                                                        <>
+                                                          {((this.loggedInUser.toLowerCase() == commentItem.submitteremailid.toLowerCase()) || ((this.loggedInUser === item.ideaowner) || (this.state.isInGroup))) &&
+                                                            <div className="dropdown-menu">
+                                                              {this.loggedInUser.toLowerCase() == commentItem.submitteremailid.toLowerCase() && (
+                                                                <>
+                                                                  <a onClick={() => this.submitComment(item.ideaid, commentItem.commentid, "DELETE", item.enteredby, item.ideatitle)} className="dropdown-item cursor-pointer" >
+                                                                    <img
+                                                                      src={deletecomment}
+                                                                      alt="edit-icon"
+                                                                      width="24"
+                                                                      height="24"
+                                                                    />
+                                                                    <span className="ms-2 dc-red"> {langText.deletecomment}</span>
+
+                                                                  </a>
+                                                                  <hr
+                                                                    className="dropdown-divider"
+                                                                    role="separator" /></>)}
+                                                              {this.loggedInUser.toLowerCase() == commentItem.submitteremailid.toLowerCase() && (
+
+                                                                <><a onClick={() => this.toggleReplyShowtextBox(commentItem.comments, commentItem.commentid)} className="dropdown-item cursor-pointer">
+                                                                  <img
+                                                                    src={editcomment}
+                                                                    alt="edit-icon"
+                                                                    width="24"
+                                                                    height="24"
+                                                                  />
+                                                                  <span className="ms-2 dc-dark">  {langText.editcomment}</span>
+
+                                                                </a>
+                                                                  <hr
+                                                                    className="dropdown-divider"
+                                                                    role="separator"
+                                                                  /></>)}
+                                                              {console.log(this.loggedInUser.toLowerCase())}
+                                                              {console.log(commentItem.submitteremailid.toLowerCase())}
+                                                              {console.log(item.ideaowner)}
+                                                              {console.log((this.loggedInUser === item.ideaowner))}
+                                                              {console.log(this.state.isInGroup)}
+                                                              {((this.loggedInUser === item.ideaowner) || (this.state.isInGroup)) && (
+                                                                <a className="dropdown-item cursor-pointer" onClick={() => this.reportCommentId(item.ideaid, commentItem.commentid, item.ideatitle, item.ideaowner, commentItem.comments)}>
+                                                                  <img
+                                                                    src={reportcomment}
+                                                                    alt="edit-icon"
+                                                                    width="24"
+                                                                    height="24"
+                                                                  />
+                                                                  <span className="ms-2 dc-dark">   {langText.report}</span>
+                                                                </a>
+                                                              )}
+                                                            </div>
+                                                          }</>
+                                                      </a>
+
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="col-lg-12 p-3 grey-box-reply mt-2">
+                                        {(!this.state.isReplyShowtextBox[commentItem.commentid] &&
+                                          <h3 className="h-idea-heading-reply mb-0">
+                                            <span className='rcs-text'> {commentItem.comments}</span>
+
+                                            {commentItem.original && (
+                                              <span className='trans-text' onClick={() => this.callPowerAutomateForTranslate(commentItem.comments, item.ideaid, index, item.original, "bycomments", commentItem.commentid)}>{langText.seetranslation}</span>
+                                            )}
+                                            <br />
+                                            {!commentItem.original && (
+                                              <><span className='rcs-text'> {commentItem.translatedText}</span><span className='trans-text' onClick={() => this.seeOrginal(commentItem.comments, item.ideaid, index, item.original, "bycomments", commentItem.commentid)}>{langText.seeoriginal}</span></>)}
+                                          </h3>)}
+                                        {(this.state.isReplyShowtextBox[commentItem.commentid] &&
+                                          <TextField
+                                            placeholder={langText.editcomment}
+                                            aria-label="Username"
+                                            aria-describedby="basic-addon1"
+                                            className="form-control"
+                                            value={this.state.editComment}
+                                            onChange={(e, newValue) => this.onChangeEditComment(e, newValue)}
+                                            onKeyPress={(e) => this.handleKeyPressEditComment(e, item.ideaid, commentItem.commentid)}
+                                          />)}
+                                      </div>
+
+                                      <div className="col-lg-12 mt-3">
+                                        <div className="clearfix">
+                                          <div className="float-start">
+                                            {commentItem.uservotecount == "0" && (
+                                              <p className="vcs-text-dark me-3 float-start mb-0 cursor-pointer">
+                                                <div onClick={() => this.submitVoteForComment(item.ideaid, commentItem.commentid, "1")} className="vote-icon">
+                                                  <span className="votecomment0">{commentItem.votecount}</span>
+                                                </div>
+
+                                              </p>
+                                            )}
+                                            {commentItem.uservotecount == "1" && (
+                                              <p className="vcs-text-dark me-3 float-start mb-0 cursor-pointer">
+                                                <div onClick={() => this.submitVoteForComment(item.ideaid, commentItem.commentid, "0")} className="vote-green-icon">
+                                                  <span className="votecomment1">{commentItem.votecount}</span>
+                                                </div>
+                                              </p>
+                                            )}
+                                            {/* <p className="vcs-text-dark me-3 ms-3 float-start mb-0 cursor-pointer">
+                                            <img
+                                              src={Voteicon}
+                                              alt="edit-icon"
+                                              width="20"
+                                              height="20"
+                                            />
+                                            <span className="ms-2">{commentItem.votecount}</span>
+                                          </p> onClick={() => this.getIdeaReplyComment(commentItem.commentid)}*/}
+                                            <p className="vcs-text-dark float-start mb-0 cursor-pointer" onClick={() => this.getIdeaCommentReply(commentItem.commentid, item.ideaid)}>
+                                              <img
+                                                src={Commentreplyicon}
+                                                alt="edit-icon"
+                                                width="20"
+                                                height="20"
+                                              />
+                                              {commentItem.repliescount < 2 && (
+                                                <span className="ms-2">{commentItem.repliescount} {langText.reply}</span>
+                                              )}
+                                              {commentItem.repliescount >= 2 && (
+                                                <span className="ms-2">{commentItem.repliescount} {langText.replies}</span>
+                                              )}
+                                            </p>
+                                          </div>
+                                          <div className="float-end">
+                                            <p className="vcs-text-dark float-start mb-0 cursor-pointer" onClick={() => this.toggleReplyCommentShow(commentItem.commentid, item.ideaid)}>
+                                              <span className="ms-2">{langText.reply1}</span>
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {/* {this.state.isReplyCommentShow[commentItem.commentid] && ( */}
+                                    <div className="col-lg-12 padding-rpy">
+
+                                      {this.state.replyStage1CommentList[commentItem.commentid] && this.state.replyStage1CommentList[commentItem.commentid].map((replyStage1CommentItem: any) => (
+                                        <div className="col-lg-12 position-relative mt-5">
+                                          <div className="h-border-box-reply">
+                                            <div className="col-lg-12 p-0">
+                                              <div className="d-flex">
+                                                <div className="flex-shrink-0">
+                                                  {this.state.profileAttachments[replyStage1CommentItem.submitteremailid] && this.state.profileAttachments[replyStage1CommentItem.submitteremailid].map((attachment: profileAttachment) => (
+                                                    <img
+                                                      className="profile-img04"
+                                                      src={attachment.imageUrl}
+                                                      alt="user pic"
+                                                    />))}
+                                                </div>
+                                                <div className="flex-grow-1 ms-2">
+                                                  <div className="row">
+                                                    <div className="col-lg-8">
+
+                                                      {this.state.designationList[replyStage1CommentItem.submitteremailid] && this.state.designationList[replyStage1CommentItem.submitteremailid].map((item: userDesignation) => (
+                                                        <h4 className="profile-name-text02">
+                                                          {item.name}
+                                                        </h4>))}
+                                                      {this.state.designationList[replyStage1CommentItem.submitteremailid] && this.state.designationList[replyStage1CommentItem.submitteremailid].map((item: userDesignation) => (
+                                                        <h5 className="grey-text03">
+                                                          {item.designation}
+                                                        </h5>))}
+                                                    </div>
+                                                    <div className="col-lg-4">
+                                                      <div className="float-end">
+                                                        <h5 className="grey-text03  float-start">
+                                                          {this.formatDate(replyStage1CommentItem.enteredon)}
+                                                        </h5>
+                                                        <div className="small-drop-e float-start">
+
+                                                          <div className="dropdown">
+                                                            <a
+                                                              className="btn btn-secondary dropdown-toggle"
+                                                              type="button"
+                                                              data-bs-toggle="dropdown"
+                                                              aria-expanded="false"
+                                                            >
+                                                              <img
+                                                                src={Replyellipsesicon}
+                                                                alt="edit-icon"
+                                                                width="24"
+                                                                height="24"
+                                                              />
+                                                              <div className="dropdown-menu">
+                                                                {this.loggedInUser.toLowerCase() == replyStage1CommentItem.submitteremailid.toLowerCase() && (
+                                                                  <>
+                                                                    <a className="dropdown-item"
+                                                                      onClick={() => this.SubmitReplyForIdeaComment(commentItem.commentid, replyStage1CommentItem.repliesid, item.ideaid, "DELETE")}>
+                                                                      <img
+                                                                        src={deletecomment}
+                                                                        alt="edit-icon"
+                                                                        width="24"
+                                                                        height="24"
+                                                                      />
+                                                                      <span className="ms-2 dc-red"> {langText.deletecomment}</span>
+
+                                                                    </a>
+                                                                    <hr
+                                                                      className="dropdown-divider"
+                                                                      role="separator" /></>)}
+                                                                {this.loggedInUser.toLowerCase() == replyStage1CommentItem.submitteremailid.toLowerCase() && (
+
+                                                                  <><a className="dropdown-item"
+                                                                    onClick={() => this.toggleEditReplyShowtextBox(commentItem.commentid, replyStage1CommentItem.repliesid, replyStage1CommentItem.comments)}>
+                                                                    <img
+                                                                      src={editcomment}
+                                                                      alt="edit-icon"
+                                                                      width="24"
+                                                                      height="24"
+                                                                    />
+                                                                    <span className="ms-2 dc-dark">  {langText.editcomment}</span>
+
+                                                                  </a>
+                                                                    <hr
+                                                                      className="dropdown-divider"
+                                                                      role="separator"
+                                                                    /></>)}
+                                                                {this.loggedInUser.toLowerCase() != replyStage1CommentItem.submitteremailid.toLowerCase() && (
+                                                                  <a className="dropdown-item"
+                                                                    onClick={() => this.reportStage2CommentId(item.ideaid, commentItem.commentid, replyStage1CommentItem.repliesid, item.ideatitle, item.ideaowner, replyStage1CommentItem.comments)}>
+                                                                    <img
+                                                                      src={reportcomment}
+                                                                      alt="edit-icon"
+                                                                      width="24"
+                                                                      height="24"
+                                                                    />
+                                                                    <span className="ms-2 dc-dark">  {langText.report}</span>
+
+                                                                  </a>)}
+                                                              </div>
+                                                            </a>
+
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div className="col-lg-12 p-3 grey-box-reply mt-2">
+                                              {(!this.state.isReply2ShowtextBox[replyStage1CommentItem.repliesid] &&
+                                                <h3 className="h-idea-heading-reply mb-0">
+                                                  {replyStage1CommentItem.comments}{" "}
+                                                </h3>)}
+                                              {(this.state.isReply2ShowtextBox[replyStage1CommentItem.repliesid] &&
+                                                <TextField
+                                                  placeholder={langText.editcomment}
+                                                  aria-label="Username"
+                                                  aria-describedby="basic-addon1"
+                                                  className="form-control"
+                                                  value={this.state.editReplyComment}
+                                                  onChange={(e, newValue) => this.onChangeReplyEditComment(e, newValue)}
+                                                  onKeyPress={(e) => this.handleKeyPressReplyEditComment(e, commentItem.commentid, replyStage1CommentItem.repliesid)}
+                                                />)}
+                                            </div>
+
+                                            <div className="col-lg-12 mt-3">
+                                              <div className="clearfix">
+                                                <div className="float-start">
+                                                  {/* <p className="vcs-text-dark me-3 ms-3 float-start mb-0 cursor-pointer">
+                          <img
+                            src={Voteicon}
+                            alt="edit-icon"
+                            width="20"
+                            height="20"
+                          />
+                          <span className="ms-2">{replyStage1CommentItem.uservotecount}</span>
+                        </p> */}
+                                                </div>
+                                                {/* <div className="float-end">
+                        <p className="vcs-text-dark float-start mb-0 cursor-pointer">
+                          <span className="ms-2">Reply</span>
+                        </p>
+                      </div> */}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                      {this.state.isReplyCommentShow[commentItem.commentid] && (
+                                        <div className="col-lg-12 input-with-img">
+
+                                          <div className="mb-3 mt-4 input-group">
+                                            <span className="input-group-text" id="basic-addon1">
+                                              {this.userImageUrl != '' && (
+                                                <img
+                                                  className="profile-img02"
+                                                  src={this.userImageUrl}
+                                                  alt="user pic"
+                                                />)}
+                                              {this.userImageUrl == '' && (
+                                                <img
+                                                  className="profile-img02"
+                                                  src={DummyProfileimg}
+                                                  alt="user pic"
+                                                />)}
+                                            </span>
+                                            <TextField
+                                              placeholder={langText.addareply}
+                                              aria-label="Username"
+                                              aria-describedby="basic-addon1"
+                                              className="form-control"
+                                              value={this.state.replyStage1Comment}
+                                              onChange={(e, newValue) =>
+                                                this.onChangeReplyComment(e, newValue)}
+                                              onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid, item.ideaid)}
+                                            />
+                                          </div>
+
+                                        </div>)}
+                                      {/* Reply section sample */}
+                                      {this.state.allReplyCommentList.map((replycommentItem: any) => (
+                                        <div className="col-lg-12 position-relative" >
+                                          <div className="h-border-box-reply">
+                                            {/* <div className="col-lg-12 input-with-img">
+                                      <div className="mb-3 mt-4 input-group">
+                                        <span className="input-group-text" id="basic-addon1">
+                                          <img
+                                            className="profile-img02"
+                                            src={ProfileImg14}
+                                            alt="user pic"
+                                          />
+                                        </span>
+                                        <TextField
+                                          placeholder="Share your thoughts"
+                                          className="form-control"
+
+                                        />
+                                      </div>
+                                    </div> */}
+
+                                            {/* <div className="col-lg-12 position-relative">
+                                      <div className="h-border-box-reply">
+                                        <div className="col-lg-12 p-0">
+                                          <div className="d-flex">
+                                            <div className="flex-shrink-0">
+                                              <img
+                                                className="profile-img04"
+                                                src={ProfileImg02}
+                                                alt="user pic"
+                                              />
+                                            </div>
+                                            <div className="flex-grow-1 ms-2">
+                                              <div className="row">
+                                                <div className="col-lg-8">
+                                                  <h4 className="profile-name-text02">
+                                                    {replycommentItem.submittername}
+                                                  </h4>
+                                                  <h5 className="grey-text03">
+                                                    Sr Specialist - Investments
+                                                  </h5>
+                                                </div>
+                                                <div className="col-lg-4">
+                                                  <div className="float-end">
+                                                    <h5 className="grey-text03  float-start">1d ago</h5>
+                                                    <div className="small-drop-e float-start">
+                                                      <div className="dropdown">
+                                                        <button
+                                                          className="btn btn-secondary dropdown-toggle"
+                                                          type="button"
+                                                          data-bs-toggle="dropdown"
+                                                          aria-expanded="false"
+                                                        >
+                                                          <img
+                                                            src={Replyellipsesicon}
+                                                            alt="edit-icon"
+                                                            width="24"
+                                                            height="24"
+                                                          />
+                                                        </button>
+                                                        <div className="dropdown-menu">
+                                                          <a className="dropdown-item cursor-pointer"
+                                                          onClick={() => this.toggleEditReplyShowtextBox(commentItem.commentid,replycommentItem.repliesid,replycommentItem.comments)}>
+                                                            Edit
+                                                          </a>
+                                                          <hr
+                                                            className="dropdown-divider"
+                                                            role="separator"
+                                                          />
+                                                          <a className="dropdown-item cursor-pointer" onClick={() => this.SubmitReplyForIdeaComment( commentItem.commentid,replycommentItem.repliesid,0, "DELETE")} >
+                                                            Delete
+                                                          </a>
+                                                          <hr
+                                                            className="dropdown-divider"
+                                                            role="separator"
+                                                          />
+                                                          <a className="dropdown-item cursor-pointer" onClick={() => this.reportStage2CommentId(item.ideaid, commentItem.commentid,replycommentItem.repliesid,item.ideatitle,item.ideaowner,replycommentItem.comments)}>
+                                      Report
+                                                          </a>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+
+
+                                      </div>
+                                      <div className="col-lg-12 p-3 grey-box-reply mt-2">
+                                        {(this.state.isReply2ShowtextBox[replycommentItem.repliesid] &&
+                    <h3 className="h-idea-heading-reply mb-0">
+                     {replycommentItem.comments}{" "}
+                    </h3>)}
+                    {(this.state.isReply2ShowtextBox[replycommentItem.repliesid] &&
+                  <TextField
+                    placeholder="Edit Comment"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                    className="form-control"
+                    value={this.state.editReplyComment}
+                     onChange={(e, newValue) => this.onChangeReplyEditComment(e, newValue)}
+                      onKeyPress={(e) => this.handleKeyPressReplyEditComment(e, commentItem.commentid,replycommentItem.repliesid)}
+                  />)}
+                                        </div>
+
+                                    </div> */}
+
+
+
+                                            {/* <div className="col-lg-12 position-relative" >
+                                      <div className="h-border-box-reply">
+                                        <div className="col-lg-12 input-with-img">
+                                          <div className="mb-3 mt-4 input-group">
+                                            <span className="input-group-text" id="basic-addon1">
+                                              <img
+                                                className="profile-img02"
+                                                src={ProfileImg14}
+                                                alt="user pic"
+                                              />
+                                            </span>
+                                            <TextField
+                                              placeholder="Share your thoughts"
+                                              className="form-control"
+
+                                            />
+                                          </div>
+                                        </div>
+
+
+                                      </div>
+                                    </div> */}
+                                          </div>
+                                        </div>
+                                      ))}
+                                      {/* Reply section sample */}
+                                    </div>
+
+                                    {/* )} */}
+
+                                  </div>
+
+
+                                ))}
+
+
+
+
+                                {/* <!-- "Load More" button --> */}
+                                {this.state.isCommentLoadMore && (
+                                  <button className="load-more-comments-btn" onClick={() => this.loadMoreComments(item.ideaid)}>{langText.loadmorecomments}</button>
+                                )}
+
+                              </div>
+                            )}
+
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            </div>
+            {/* Bookmark toaster */}
+            {this.isLoadMore && (
+              <div className="col-lg-12">
+                <div className="col-lg-12 p-0 loadmore-ideas-btn-section mb-4">
+                  <div className="row justify-content-center">
+                    <p className="col-4 vcs-text-dark text-center mt-3  mb-0 cursor-pointer">
+                      <span className="ms-2 text-green" onClick={() => this.loadMoreItems()} >{langText.loadmoreideas}</span>
+                    </p>
+                  </div>
+                </div>
+
+              </div>)}
+
+            <div
+              className={this.state.bookMarkClass}
+              id="Bookmarkmodal"
+              aria-labelledby="BookmarkmodalLabel"
+              aria-hidden="true"
+              data-backdrop="false"
+            >
+              <div className="modal-dialog modal-tw">
+                <div className="modal-content">
+                  <div className="modal-body">
+                    <div className="row">
+                      <div className="col-lg-12">
+                        <div className="toast-body">
+                          <div className="clearfix">
+                            <img
+                              src={Bookmarkiconwhite}
+                              className="float-start me-2"
+                              alt="edit-icon"
+                              width="16"
+                              height="20"
+                            />
+                            <p className="float-start mb-0 me-2">
+                              {/* {this.state.addedtoyourbookmarks} */}
+                              {this.state.bookMarkDesc}
+                              {/* Added to your Bookmarks */}
+                            </p>
+                            <a
+                              className="float-end tb-link"
+                              href="https://dewa.sharepoint.com/sites/qaideation/SitePages/Bookmarks.aspx"
+                            >
+                              <strong>
+                                {langText.view}
+                              </strong>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* link copied toaster */}
+            <div
+              className="modal fade"
+              id="Linkcopiedmodal"
+              aria-labelledby="LinkcopiedmodalLabel"
+              aria-hidden="true"
+              data-backdrop="false"
+            >
+              <div className="modal-dialog modal-tw">
+                <div className="modal-content">
+                  <div className="modal-body">
+                    <div className="row">
+                      <div className="col-lg-12">
+                        <div className="toast-body">
+                          <div className="clearfix">
+
+                            <p className="text-center mb-0 me-2">
+                              {langText.linkcopied}
+                            </p>
+
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Message Sent toaster */}
+            <div
+              className="modal fade"
+              id="DirectMessageSentmodal"
+              aria-labelledby="DirectMessageSentmodalLabel"
+              aria-hidden="true"
+              data-backdrop="false"
+            >
+              <div className="modal-dialog modal-tw">
+                <div className="modal-content">
+                  <div className="modal-body">
+                    <div className="row">
+                      <div className="col-lg-12">
+                        <div className="toast-body">
+                          <div className="clearfix">
+
+                            <p className="text-center mb-0 me-2">
+                              {langText.directmessagesent}
+                            </p>
+
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Dialog
+              hidden={!this.state.isSuccessDialogVisible}
+              onDismiss={this.closeSuccessDialog}
+              dialogContentProps={{
+                type: DialogType.normal,
+                title: `${this.state.successMessageTitle}`,
+                subText: `${this.state.successMessageDesciption}`,
+                className: 'ebtdialogsuccess'
+              }}
+            >
+              <img
+                src={MIe01}
+                className="mis-icon ebtdialogicon"
+                alt="edit-icon"
+                width="48"
+                height="48"
+              />
+              <DialogFooter>
+                <DefaultButton onClick={this.closeSuccessDialog} text={langText.closed} />
+              </DialogFooter>
+            </Dialog>
+
+            <Dialog
+              hidden={!this.state.isDialogVisible}
+              onDismiss={this.closeErrorDialog}
+              dialogContentProps={{
+                type: DialogType.normal,
+                title: `${this.state.errorTitle}`,
+                subText: `${this.state.errorDesciption}`,
+                className: 'ebtdialogerror'
+              }}
+            >
+              <img
+                src={MIe02}
+                className="mins-icon ebtdialogicon"
+                alt="edit-icon"
+                width="48"
+                height="48"
+              />
+
+              <DialogFooter>
+                <DefaultButton onClick={this.closeErrorDialog} text={langText.closed} />
+              </DialogFooter>
+            </Dialog>
+
+            {/* loader section */}
+            <div className="row m-0">
+              {this.state.isLoader && (
+                <div className="col-lg-12 p-0">
+                  <div className="lds-ring-backdrop">
+                    <div className="lds-ring-container">
+                      <div className='ebtloader'></div>
+                      <div className="text-center lds-text">{langText.loading}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* loader section */}
+
+            <Dialog
+              hidden={!this.state.stage1CommentReportDialog}
+              onDismiss={this.closestage1CommentReportDialog}
+              dialogContentProps={{
+                type: DialogType.normal,
+                title: "Do you want to report this comment?",
+                className: 'ebtdialogsuccess reportcomment'
+              }}
+            >
+              {/* <div className='row'>
+
+
+          Do you want to report this comment?
+                  </div> */}
+              <img
+                src={MIe01}
+                className="mis-icon ebtdialogicon"
+                alt="edit-icon"
+                width="48"
+                height="48"
+              />
+              <DialogFooter>
+                <DefaultButton className='' onClick={() => this.closestage1CommentReportDialog()} text={langText.closed} />
+                <DefaultButton onClick={() => this.reportComment()} text={langText.yes} />
+
+              </DialogFooter>
+            </Dialog>
+
+            <Dialog
+              hidden={!this.state.stage2CommentReportDialog}
+              onDismiss={this.closestage2CommentReportDialog}
+              dialogContentProps={{
+                type: DialogType.normal,
+                title: "Do you want to report this comment?",
+                className: 'ebtdialogsuccess reportcomment'
+              }}
+            >
+              {/* <div className='row'>
+
+          Do you want to report this comment?
+                  </div> */}
+              <img
+                src={MIe01}
+                className="mis-icon ebtdialogicon"
+                alt="edit-icon"
+                width="48"
+                height="48"
+              />
+              <DialogFooter>
+                <DefaultButton onClick={() => this.closestage2CommentReportDialog()} text={langText.closed} />
+                <DefaultButton onClick={() => this.reportStage2Comment()} text={langText.yes} />
+              </DialogFooter>
+            </Dialog>
+          </div>
+        </div>
+      </section>
+    );
+  }
+}
