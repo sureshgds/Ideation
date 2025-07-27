@@ -416,7 +416,8 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
 
   }
 
- separateBysubmitteremailid(data: any): any {
+
+  separateBysubmitteremailid(data: any): any {
     return data.reduce((result: any, item: any) => {
       if (!result[item.submitteremailid]) {
         result[item.submitteremailid] = [];
@@ -425,7 +426,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
       return result;
     }, {});
   }
- public isUserIdMatch(dataList: any, loginUserId: any) {
+  public isUserIdMatch(dataList: any, loginUserId: any) {
     let dataList1: any = [];
     dataList1 = dataList.filter((a: any) => a.approvername === loginUserId && a.approvalstatus === "Approved");
     return dataList1
@@ -477,8 +478,8 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
     }
     apiResponse = await this.IdeationServices.getData(params, headers, "getIdeaApproval");
     responseData = apiResponse.data;
-    let datafilter = responseData.data.filter((a: any) => a.approverrole == "Financialrewardverificationteam");
-     if (datafilter.length > 0) {
+     let datafilter = responseData.data.filter((a: any) => a.approverrole == "Financialrewardverificationteam");
+    if (datafilter.length > 0) {
       let submitterData: any = [];
       submitterData = this.separateBysubmitteremailid(datafilter);
       console.log(submitterData);
