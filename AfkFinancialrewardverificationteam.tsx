@@ -416,8 +416,20 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
 
   }
 
-
-
+ separateBysubmitteremailid(data: any): any {
+    return data.reduce((result: any, item: any) => {
+      if (!result[item.submitteremailid]) {
+        result[item.submitteremailid] = [];
+      }
+      result[item.submitteremailid].push(item);
+      return result;
+    }, {});
+  }
+ public isUserIdMatch(dataList: any, loginUserId: any) {
+    let dataList1: any = [];
+    dataList1 = dataList.filter((a: any) => a.approvername === loginUserId && a.approvalstatus === "Approved");
+    return dataList1
+  }
 
   public async getIdeaApproval() {
 
@@ -465,7 +477,59 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
     }
     apiResponse = await this.IdeationServices.getData(params, headers, "getIdeaApproval");
     responseData = apiResponse.data;
-    
+    let datafilter = responseData.data.filter((a: any) => a.approverrole == "Financialrewardverificationteam");
+     if (datafilter.length > 0) {
+      let submitterData: any = [];
+      submitterData = this.separateBysubmitteremailid(datafilter);
+      console.log(submitterData);
+      // const submitterDataLength = Object.keys(submitterData).length;
+      let flitereddata: any = [];
+      flitereddata = this.isUserIdMatch(datafilter, user.prno);
+      console.log(flitereddata);
+      let isMatch = false;
+      if (flitereddata.length > 0) {
+        isMatch = true;
+      }
+
+      let approvedStatus: any = ""
+      if (this.state.lang == 'en') {
+        approvedStatus = 'Approved';
+      }
+      else {
+        approvedStatus = 'موافق عليه';
+      }
+
+
+      // if (submitterDataLength >= 3 || isMatch) {
+      if (isMatch) {
+        if (this.state.lang == 'en') {
+          this.setState({
+            isLoader: false,
+            isSuccess: true,
+            errorTitle: this.state.warningMessage,
+            errorDescription: "You have already " + approvedStatus + " this idea",
+
+          });
+        }
+        else {
+          this.setState({
+            isLoader: false,
+            isSuccess: true,
+            errorTitle: this.state.warningMessage,
+            errorDescription: "لقد وافقتَ على هذه الفكرة بالفعل",
+
+          });
+        }
+        this.openErrorDialog();
+        this.setState({
+          isLoader: false,
+          isSuccess: true,
+          errorTitle: this.state.warningMessage,
+          successMessageDesciption: this.state.youHavealready + " " + approvedStatus,
+        });
+        this.openErrorDialog();
+      }
+    }
     let dataList = [];
     dataList = responseData.data.filter((a: any) => a.approverrole == "Financialrewardverificationteam");
     let dataList1 = [];
