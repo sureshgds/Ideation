@@ -893,13 +893,15 @@ export default class AfkHeadofdivisionevaluationcommittee extends React.Componen
     responseData = apiResponse.data;
     console.log("getIdeaApproval", responseData);
 
-    if (responseData.data.length > 0) {
+    let datafilter = responseData.data.filter((a: any) => a.approverrole == "HeadofDivisionEvaluationCommittee");
+
+    if (datafilter.length > 0) {
       let submitterData: any = [];
-      submitterData = this.separateBysubmitteremailid(responseData.data);
+      submitterData = this.separateBysubmitteremailid(datafilter);
       console.log(submitterData);
       // const submitterDataLength = Object.keys(submitterData).length;
       let flitereddata: any = [];
-      flitereddata = this.isUserIdMatch(responseData.data, user.prno);
+      flitereddata = this.isUserIdMatch(datafilter, user.prno);
       console.log(flitereddata);
       let isMatch = false;
       if (flitereddata.length > 0) {
@@ -946,7 +948,7 @@ export default class AfkHeadofdivisionevaluationcommittee extends React.Componen
       }
     }
     let calculationFilterList = [];
-    calculationFilterList = responseData.data.filter((a: any) => a.approverrole == "Divisionhybridinnovationcommittee");
+    calculationFilterList = responseData.data.filter((a: any) => a.approverrole == "HeadofDivisionEvaluationCommittee");
     if (calculationFilterList.length > 0) {
       let radicalSumValue: any = 0;
       let sustainingSumValue: any = 0;
