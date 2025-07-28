@@ -95,9 +95,9 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   fetchJsonFile = async (fileName: any) => {
     try {
       // Specify the file path in the document library
-      const web: any = new Web("https://dewa.sharepoint.com/sites/ideation/");
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
 
-      const filePath = "/sites/ideation/SiteAssets/IdeationAssets/lang/" + fileName;
+      const filePath = "/sites/qaideation/SiteAssets/IdeationAssets/lang/" + fileName;
 
       const file = await web.getFileByServerRelativeUrl(filePath).getText();
 
@@ -122,7 +122,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   // Get Token In Share point list
   public async getToken() {
 
-    const web: any = new Web("https://dewa.sharepoint.com/sites/ideation/");
+    const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
     const listItems: any = await web.lists.getByTitle("TokenDispenser")
       .items
       .get();
@@ -139,7 +139,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   // Get HMAC key In Share point list
   public async getHMACENABLEorDISABLE() {
     try {
-      const web: any = new Web("https://dewa.sharepoint.com/sites/ideation");
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation");
       const listItems: any = await web.lists.getByTitle("HMACConfigList")
         .items
         .get();
@@ -164,7 +164,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   public async loadVideosForIdea() {
     try {
       // Fetch items from a specific document library
-      const web: any = new Web("https://dewa.sharepoint.com/sites/ideation/");
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
       const items = await web.lists.getByTitle("IdeaAudioVideo")
         .items
         .filter(`IdeaID eq '${this.ideaID}'`)
@@ -191,7 +191,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   public async loadVideosForSolu() {
     try {
       // Fetch items from a specific document library
-      const web: any = new Web("https://dewa.sharepoint.com/sites/ideation/");
+      const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
       const items = await web.lists.getByTitle("CampaignSolutionAudioVideo")
         .items
         .filter(`CampaignSolutionID eq '${this.ideaID}'`)
@@ -230,7 +230,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
 
   // Redierct Idea Deatails Page
   public redirectIdeaDetails = () => {
-    window.open("https://dewa.sharepoint.com.mcas.ms/sites/ideation/SitePages/IdeaInnerPage.aspx?ideaID=" + this.ideaID, '_blank');
+    window.open("https://dewa.sharepoint.com.mcas.ms/sites/qaideation/SitePages/IdeaInnerPage.aspx?ideaID=" + this.ideaID, '_blank');
   };
   public createVideoFilesListItems() {
     let rows = [];
@@ -416,8 +416,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
 
   }
 
-
-  separateBysubmitteremailid(data: any): any {
+ separateBysubmitteremailid(data: any): any {
     return data.reduce((result: any, item: any) => {
       if (!result[item.submitteremailid]) {
         result[item.submitteremailid] = [];
@@ -431,6 +430,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
     dataList1 = dataList.filter((a: any) => a.approvername === loginUserId && a.approvalstatus === "Approved");
     return dataList1
   }
+
 
   public async getIdeaApproval() {
 
@@ -478,6 +478,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
     }
     apiResponse = await this.IdeationServices.getData(params, headers, "getIdeaApproval");
     responseData = apiResponse.data;
+    
      let datafilter = responseData.data.filter((a: any) => a.approverrole == "Financialrewardverificationteam");
     if (datafilter.length > 0) {
       let submitterData: any = [];
@@ -508,7 +509,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
             isLoader: false,
             isSuccess: true,
             errorTitle: this.state.warningMessage,
-            errorDescription: "You have already " + approvedStatus + " this idea",
+            successMessageDesciption: "You have already " + approvedStatus + " this idea",
 
           });
         }
@@ -517,7 +518,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
             isLoader: false,
             isSuccess: true,
             errorTitle: this.state.warningMessage,
-            errorDescription: "لقد وافقتَ على هذه الفكرة بالفعل",
+            successMessageDesciption: "لقد وافقتَ على هذه الفكرة بالفعل",
 
           });
         }
@@ -585,7 +586,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   }
 
   public redirecthome = () => {
-    window.location.replace("https://dewa.sharepoint.com.mcas.ms/sites/ideation");
+    window.location.replace("https://dewa.sharepoint.com.mcas.ms/sites/qaideation");
   }
   changeLanguage() {
     const body = document.body;
@@ -874,7 +875,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   }
   public approvalEntry = async (approvalStatus: any, approvalRole: any, ideaTitle: any, ideaOwner: any, emailID: any) => {
 
-    const web: any = new Web("https://dewa.sharepoint.com/sites/ideation/");
+    const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
     const listitem: any = await web.lists.getByTitle("CommonApprovalList").items.add(
       {
         IdeaID: this.ideaID,
@@ -929,7 +930,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
     return value; // Return the original value if it's not a valid number
   }
   public async getUrls(name: any) {
-    const web: any = new Web("https://dewa.sharepoint.com/sites/ideation/");
+    const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
     const listItems: any = await web.lists.getByTitle("PowerAutomateFlowsList")
       .items
       .filter(`Title eq '${name}'`)
@@ -1061,10 +1062,10 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
   };
 
   public redirectHome = () => {
-    window.location.replace("https://dewa.sharepoint.com/sites/ideation");
+    window.location.replace("https://dewa.sharepoint.com/sites/qaideation");
   };
   public redirectHeadofDivisionEvaluationCommittee = () => {
-    window.location.replace("https://dewa.sharepoint.com/sites/ideation/SitePages/HeadofDivisionEvaluationCommittee.aspx?ideaID=" + this.ideaID);
+    window.location.replace("https://dewa.sharepoint.com/sites/qaideation/SitePages/HeadofDivisionEvaluationCommittee.aspx?ideaID=" + this.ideaID);
   };
   public onChangeRemarksComment(e: any, selctedOptions: any) {
 
@@ -1107,7 +1108,7 @@ export default class AfkFinancialrewardverificationteam extends React.Component<
         <div className={this.state.class}>
           <div className="row">
             <div className="col-lg-12 back-heading head-navlink">
-              <a href="https://dewa.sharepoint.com.mcas.ms/sites/ideation">
+              <a href="https://dewa.sharepoint.com.mcas.ms/sites/qaideation">
                 <img
                   className="float-start"
                   src={Backarrow}
