@@ -19,6 +19,7 @@ import Bookmarkiconwhite from "./../assets/img/svg/bookmark-icon-filled-white.pn
 import Commenticon from "./../assets/img/svg/comment-icon.png";
 import Shareicon from "./../assets/img/svg/share-icon.png";
 import Downloadicon from "./../assets/img/svg/download-icon.png";
+import NoActionRequired from "./../assets/img/no-action-required.png";
 import { DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, 
   //IStackTokens, 
   SearchBox, 
@@ -477,7 +478,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     }
   };
   public getallIdeasforexplore = async (startnum = 0, action = "", filter = "", actionWithCase = "") => {
-    debugger;
+   // debugger;
     this.setState({ isLoader: true, allIdeaList: [], topFilter: filter, filterWithCase: actionWithCase == "" ? "Recent" : actionWithCase });
     let apiResponse: any;
     let responseData: any = [];
@@ -2261,7 +2262,7 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                       {" "}
                       {langText.implemented}
                     </a>
-                    <hr className="dropdown-divider" role="separator" />
+                    {/* <hr className="dropdown-divider" role="separator" />
                     <a onClick={() => this.getallIdeasforexplore(0, "LATEST SUBMISSIONS", this.state.topFilter, this.state.latestsubmissions)} className="dropdown-item" href="#">
                       {" "}
                       {langText.latestsubmissions}
@@ -2270,7 +2271,7 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                     <a onClick={() => this.getallIdeasforexplore(0, "OLD SUBMISSIONS", this.state.topFilter, this.state.oldsubmissions)} className="dropdown-item" href="#">
                       {" "}
                       {langText.oldsubmissions}
-                    </a>
+                    </a> */}
                     <hr className="dropdown-divider" role="separator" />
                     <a onClick={() => this.getallIdeasforexplore(0, "MOST LIKED", this.state.topFilter, this.state.mostliked)} className="dropdown-item" href="#">
                       {" "}
@@ -2289,13 +2290,19 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
             </div>
           </div>
 
-          {this.state.allIdeaList.length ==0 && (
-       <div className="no-data-section">
+          {(this.state.allIdeaList.length ==0&&!this.state.isLoader) && (
+       <div className="no-action-required">
                           <div className="row m-0">
-                            <div className="col-lg-12 p-0 position-relative">
-                              <h3 className="load-more-green text-center">
-                                <a>{langText.nodata}</a>
-                              </h3>
+                            <div className="col-lg-12 p-0 position-relative text-center">
+                              <img
+                                className="no-action-img"
+                                 src={NoActionRequired}
+                                alt="user pic"
+                              />
+                              <h4 className='mt-2'>
+                                {langText.noactionsrequired}
+                              </h4>
+                              <p className='mt-4'>{langText.Youreallcaughtupnothingneedsyourattentionrightnow}</p>
                             </div>
                           </div>
                         </div>
