@@ -3237,7 +3237,7 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
                                         }
                                         onKeyPress={(e) => this.handleKeyPress(e, item.ideaid, item.ideatitle, item.ideaowner)}
                                       />
-                                     <span className="input-send-comment">\
+                                     <span className="input-send-comment">
                                        {this.state.showExtraSpan && (
                                         <img
                                           className="sentcomment-img"
