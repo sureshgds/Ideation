@@ -11,6 +11,7 @@ import { Web } from 'sp-pnp-js';
 import { IdeationAPIServices } from '../../../ideationAPIservice/ideationAPI';
 import { IAfkDraftsStates } from './IAfkDraftsStates';
 import * as CryptoJS from 'crypto-js';
+import MIe02 from "./../assets/img/svg/modal/cancel-clipboard.png";
 
 export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraftsStates, {}> {
   private IdeationServices: IdeationAPIServices;
@@ -21,6 +22,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
     this.IdeationServices = new IdeationAPIServices();
     this.state = {
       isSuccess: false,
+      isdraftopopup: false,
       isLoader: true,
       allDraftIdeaList: [],
       imageList: [],
@@ -31,13 +33,14 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
       class: "afkdrafts-en",
       englishContent: "",
       arabicContent: "",
-      ago:"",
-      minute:"",
-      hour:"",
-      day:"",
-      week:"",
-      month:"",
-      year:""
+      ago: "",
+      minute: "",
+      hour: "",
+      day: "",
+      week: "",
+      month: "",
+      year: "",
+      myideaid: ""
     }
   }
   public async componentDidMount(): Promise<void> {
@@ -91,7 +94,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
         //   // errorMessage: 'رسالة خطأ',hasBeen: 'تم ', byYOu: ' بواسطتك.', successfully: 'تم التقديم بنجاح',
         //   // successMessage: 'رسالة نجاح', unableTo: 'غير قادرعلى', tryAgainlater: 'تعذر الإرسال. يرجى المحاولة مرة أخرى لاحقا.',
         // });
-         this.setState({ class: "afkdrafts-ar", lang: "ar",ago:'قبل',minute:'دقيقة',hour:'ساعة',day:'يوم',week:'أسبوع',month:'شهر',year:'سنة' });
+        this.setState({ class: "afkdrafts-ar", lang: "ar", ago: 'قبل', minute: 'دقيقة', hour: 'ساعة', day: 'يوم', week: 'أسبوع', month: 'شهر', year: 'سنة' });
         this.globalClass = "global-ar"
         body.classList.add('global-ar');
         this.langCode = 14337;
@@ -106,7 +109,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
         //   //  errorMessage: 'Error Message', hasBeen: ' has been', byYOu: 'By you.', successfully: 'Submitted Successfully.',
         //   // successMessage: 'Success Message', unableTo: 'Unable to', tryAgainlater: 'Unable to Submit. Please try again later.',
         // });
-         this.setState({ class: "afkdrafts-en", lang: "en",ago:'ago',minute:'m',hour:'h',day:'d',week:'w',month:'m',year:'y' });
+        this.setState({ class: "afkdrafts-en", lang: "en", ago: 'ago', minute: 'm', hour: 'h', day: 'd', week: 'w', month: 'm', year: 'y' });
         this.globalClass = "global-en"
         body.classList.add('global-en');
         this.langCode = 1033;
@@ -117,7 +120,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
       }
     } else {
       this.setState({
-        class: "afkdrafts-en", lang: "en", 
+        class: "afkdrafts-en", lang: "en",
         // errorMessage: 'Error Message', hasBeen: ' has been', byYOu: 'By you.', successfully: 'Submitted Successfully.',
         // successMessage: 'Success Message', unableTo: 'Unable to', tryAgainlater: 'Unable to Submit. Please try again later.',
       });
@@ -242,8 +245,8 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
       let responseData: any = [];
       let struser: any = localStorage.getItem('userinfo');
       let user = JSON.parse(struser);
-       let jtv:any = localStorage.getItem("Jtv");
-    let jtvparse = JSON.parse(jtv);
+      let jtv: any = localStorage.getItem("Jtv");
+      let jtvparse = JSON.parse(jtv);
       console.log("getMyideas", user.userName)
       let params = {
         userid: user.prno,//user.userName,
@@ -261,7 +264,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
             Accept: 'application/json',
             'hmac-base64': hmacValue,
             'Authorization': `Bearer ${this.state.token}`,
-             'x-jwt-token':jtvparse.Jtv
+            'x-jwt-token': jtvparse.Jtv
           }
         };
       }
@@ -412,7 +415,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
   //   }
   // };
 
-    formatTimeElapsed = (timestamp: any) => {
+  formatTimeElapsed = (timestamp: any) => {
     const commentDate: any = new Date(timestamp);
     const currentDate: any = new Date();
 
@@ -473,7 +476,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
     }
   };
 
-   redirectInnerPage(id: any) {
+  redirectInnerPage(id: any) {
     console.log(id)
     window.location.replace("https://dewa.sharepoint.com.mcas.ms/sites/qaideation/SitePages/ShareyourIdeaRevise.aspx?ideaID=" + id);
   }
@@ -496,71 +499,77 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
     console.log(listitem);
 
   }
-// private deleteDraft = async (ideaid: number) => {
-//   console.log("Clicked delete icon for idea ID:", ideaid);
-//   try {
-//     let struser: any = localStorage.getItem('userinfo');
-//     let user = JSON.parse(struser);
-//     let jtv: any = localStorage.getItem("Jtv");
-//     let jtvparse = JSON.parse(jtv);
+  // private deleteDraft = async (ideaid: number) => {
+  //   console.log("Clicked delete icon for idea ID:", ideaid);
+  //   try {
+  //     let struser: any = localStorage.getItem('userinfo');
+  //     let user = JSON.parse(struser);
+  //     let jtv: any = localStorage.getItem("Jtv");
+  //     let jtvparse = JSON.parse(jtv);
 
-//     let params = {
-//       userid: user.prno,
-//       ideaid: ideaid,
-//       Action:"Delete"
-//     };
+  //     let params = {
+  //       userid: user.prno,
+  //       ideaid: ideaid,
+  //       Action:"Delete"
+  //     };
 
-//     const sK0y = this.state.sK0y;
-//     const jString = JSON.stringify(params);
-//     const hmacValue = this.generateHMAC(jString, sK0y);
+  //     const sK0y = this.state.sK0y;
+  //     const jString = JSON.stringify(params);
+  //     const hmacValue = this.generateHMAC(jString, sK0y);
 
-//     let headers: any;
-//     if (this.state.isHMAC == "Enable") {
-//       headers = {
-//         headers: {
-//           'Content-Type': 'application/json',
-//           Accept: 'application/json',
-//           'hmac-base64': hmacValue,
-//           'Authorization': `Bearer ${this.state.token}`,
-//           'x-jwt-token': jtvparse.Jtv
-//         }
-//       };
-//     } else {
-//       headers = {
-//         headers: {
-//           'Content-Type': 'application/json',
-//           Accept: 'application/json'
-//         }
-//       };
-//     }
+  //     let headers: any;
+  //     if (this.state.isHMAC == "Enable") {
+  //       headers = {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Accept: 'application/json',
+  //           'hmac-base64': hmacValue,
+  //           'Authorization': `Bearer ${this.state.token}`,
+  //           'x-jwt-token': jtvparse.Jtv
+  //         }
+  //       };
+  //     } else {
+  //       headers = {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Accept: 'application/json'
+  //         }
+  //       };
+  //     }
 
-//     await this.IdeationServices.postData(params, headers, "myideas");
-//     this.myideas(); 
-//   } catch (error) {
-//     console.error("Delete failed", error);
-//     this.errorLog(error, "deleteDraft", "deleteDraft", "afk-drafts");
-//   }
-// };
-public deleteDraft = async (ideaId: number) => {
-  try {
-    this.setState({ isLoader: true });
+  //     await this.IdeationServices.postData(params, headers, "myideas");
+  //     this.myideas(); 
+  //   } catch (error) {
+  //     console.error("Delete failed", error);
+  //     this.errorLog(error, "deleteDraft", "deleteDraft", "afk-drafts");
+  //   }
+  // };
 
-    const user = JSON.parse(localStorage.getItem("userinfo") || "{}");
-    const jtv = JSON.parse(localStorage.getItem("Jtv") || "{}");
+  public deleteDraftConfirm = (ideaId: number) => {
+    console.log("Clicked delete icon for idea ID:", ideaId);
 
-    const params = {
-      ideaid: ideaId,
-      ideaowner: user.prno,
-      Action: "Delete",
-      languagecode: this.langCode
-    };
+    this.setState({ isdraftopopup: true, myideaid: ideaId });// Open the delete confirmation popup
+  };
+  public deleteDraft = async (ideaId: number) => {
+    try {
+      this.setState({ isLoader: true });
 
-    const sK0y = this.state.sK0y;
-    const jString = JSON.stringify(params);
-    const hmacValue = this.generateHMAC(jString, sK0y);
+      const user = JSON.parse(localStorage.getItem("userinfo") || "{}");
+      const jtv = JSON.parse(localStorage.getItem("Jtv") || "{}");
 
-    const headers = this.state.isHMAC === "Enable"
-      ? {
+      const params = {
+        ideaid: ideaId,
+        ideaowner: user.prno,
+        Action: "Delete",
+        languagecode: this.langCode
+      };
+
+      const sK0y = this.state.sK0y;
+      const jString = JSON.stringify(params);
+      const hmacValue = this.generateHMAC(jString, sK0y);
+
+      const headers = this.state.isHMAC === "Enable"
+        ? {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -569,108 +578,175 @@ public deleteDraft = async (ideaId: number) => {
             "x-jwt-token": jtv.Jtv
           }
         }
-      : {
+        : {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json"
           }
         };
 
-    const response = await this.IdeationServices.postData(params, headers, "submitidea");
+      const response = await this.IdeationServices.postData(params, headers, "submitidea");
       console.log("Sending DELETE request to submitidea", params, headers);
 
-    if (response?.data?.responseCode > 0) {
-  
-      this.setState(prevState => ({
-        allDraftIdeaList: prevState.allDraftIdeaList.filter(
-          (idea: any) => parseInt(idea.ideaid) !== parseInt(ideaId.toString())
-        ),
-        isLoader: false
-      }));
-      console.log("Draft deleted successfully");
-      this.myideas();
-    } else {
-      console.error("Failed to delete draft:", response?.data?.message || "Unknown error");
+      if (response?.data?.responseCode > 0) {
+
+        this.setState(prevState => ({
+          allDraftIdeaList: prevState.allDraftIdeaList.filter(
+            (idea: any) => parseInt(idea.ideaid) !== parseInt(ideaId.toString())
+          ),
+          isLoader: false
+        }));
+        console.log("Draft deleted successfully");
+        this.myideas();
+      } else {
+        console.error("Failed to delete draft:", response?.data?.message || "Unknown error");
+        this.setState({ isLoader: false ,isdraftopopup: false});
+      }
+    } catch (error) {
+      console.error("Delete Draft Error:", error);
       this.setState({ isLoader: false });
     }
-  } catch (error) {
-    console.error("Delete Draft Error:", error);
-    this.setState({ isLoader: false });
-  }
-};
+  };
   public render(): React.ReactElement<IAfkDraftsProps> {
-  const langText = this.state.lang === "en" ? this.state.englishContent : this.state.arabicContent;
+    const langText = this.state.lang === "en" ? this.state.englishContent : this.state.arabicContent;
 
-  return (
-    <div className="col-lg-12 afk-drafts">
-      <div className={this.state.class}>
-      {console.log("allideaList", this.state.allDraftIdeaList)}
-        {this.state.allDraftIdeaList.length > 0 && (
-          <div className="row">
-            <div className="col-lg-12 back-heading head-navlink">
-              <h2 className="back-heading ms-3 float-start">
-                {langText.drafts} ({this.state.allDraftIdeaList.length})
-              </h2>
+    return (
+      <div className="col-lg-12 afk-drafts">
+        <div className={this.state.class}>
+          {console.log("allideaList", this.state.allDraftIdeaList)}
+          {this.state.allDraftIdeaList.length > 0 && (
+            <div className="row">
+              <div className="col-lg-12 back-heading head-navlink">
+                <h2 className="back-heading ms-3 float-start">
+                  {langText.drafts} ({this.state.allDraftIdeaList.length})
+                </h2>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {this.state.allDraftIdeaList.map((item: any) => (
-          <div className="row mt-4" key={item.ideaid}>
-            <div className="col-lg-12 position-relative">
-              <div className="h-border-box-fill">
-                <div className="col-lg-12 p-0">
-                  <div className="col-lg-12 p-0 cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
-                    <div className="d-flex">
-                      <div className="flex-grow-1 me-2">
-                        <div className="col-lg-12 p-0">
-                          <p className="h-lh-text-n">{item.ideatitle}</p>
-                          <p className="h-lh-text-n-date dfts-dt">
-                            {this.formatTimeElapsed(item.enteredon)}
-                          </p>
+          {this.state.allDraftIdeaList.map((item: any) => (
+            <div className="row mt-4" key={item.ideaid}>
+              <div className="col-lg-12 position-relative">
+                <div className="h-border-box-fill">
+                  <div className="col-lg-12 p-0">
+                    <div className="col-lg-12 p-0 cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
+                      <div className="d-flex">
+                        <div className="flex-grow-1 me-2">
+                          <div className="col-lg-12 p-0">
+                            <p className="h-lh-text-n">{item.ideatitle}</p>
+                            <p className="h-lh-text-n-date dfts-dt">
+                              {this.formatTimeElapsed(item.enteredon)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="flex-shrink-0 position-relative">
-                       
-                        {this.getImageURL(item.ideaid).map((imageURL: any, index: number) => (
-                          <img
-                            key={index}
-                            src={imageURL}
-                            alt={`Image ${index + 1}`}
-                            className="hnews-img"
-                          />
-                        ))}
+                        <div className="flex-shrink-0 position-relative">
 
-                       
-                        <div className="position-absolute top-0 end-0 mt-2 me-3">
-                          <button
-                            type="button"
-                            className="btn btn-link p-0 m-0"
-                            style={{ boxShadow: "none" }}
-                            onClick={(e) => {
-                              e.stopPropagation(); 
-                              this.deleteDraft(item.ideaid); // call delete
-                            }}
-                          >
+                          {this.getImageURL(item.ideaid).map((imageURL: any, index: number) => (
                             <img
-                              src={Deletetrash}
-                              alt="Delete"
-                              title="Delete Draft"
-                              style={{ width: '18px', height: '18px' }}
+                              key={index}
+                              src={imageURL}
+                              alt={`Image ${index + 1}`}
+                              className="hnews-img"
                             />
-                          </button>
+                          ))}
+
+
+                          <div className="position-absolute top-0 end-0 mt-2 me-3">
+                            <button
+                              type="button"
+                              className="btn btn-link p-0 m-0"
+                              style={{ boxShadow: "none" }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                this.deleteDraftConfirm(item.ideaid); // call delete
+                              }}
+                            >
+                              <img
+                                src={Deletetrash}
+                                alt="Delete"
+                                title="Delete Draft"
+                                style={{ width: '24px', height: '24px' }}
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteDraftModal"
+                              />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div> 
-              </div> 
-            </div> 
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {this.state.isdraftopopup && (
+
+          <div
+            className="modal fade"
+            id="deleteDraftModal"
+            aria-labelledby="deleteDraftModal"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-90w">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-lg-12 text-center mb-3">
+                      <img
+                        src={MIe02}
+                        className="mins-icon"
+                        alt="edit-icon"
+                        width="48"
+                        height="48"
+                      />
+                    </div>
+                    <div className="col-lg-12">
+                      <h1 className="moheading01">{langText.deletedraft}</h1>
+                      <p className="motext01">
+                        {langText.areyousureyouwanttodeletethisdraft}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer justify-content-center">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary m-btn"
+                    data-bs-dismiss="modal"
+                  >
+                    {" "}
+                    {langText.cancel}
+                  </button>
+                  <button
+                    type="button"
+                    id='Cancel Challenges/opportunities'
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      this.deleteDraft(this.state.myideaid); // call delete
+                    }}
+                    className="btn btn-danger m-btn"
+                  >
+                    {langText.delete}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        ))}
+
+        )}
       </div>
-    </div>
-  );
-}
+    );
+  }
 }
