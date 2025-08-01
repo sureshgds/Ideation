@@ -10,6 +10,7 @@ require("../../../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js");
 // import Blockquoteicon from './../assets/img/svg/blockquote-icon.png';
 import ReactTooltip from "react-tooltip";
 import Downloadicon from "./../assets/img/svg/download-icon.png";
+import SentComment from "./../assets/img/svg/send-comment.png";
 //import Voteicon from "./../assets/img/svg/vote-icon.png";
 // import Votegreenicon from "./../assets/img/svg/vote-green-icon.svg";
 // import HomeBanner09 from "./../assets/img/hbanner09.jpg";
@@ -165,42 +166,44 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
       onlyyouractivity: "",
       Recent: "",
       bookmarksremoved: "",
+      searchText: "",
     }
   }
   public async componentDidMount(): Promise<void> {
-    let struser: any = localStorage.getItem('userinfo');
-    let user = JSON.parse(struser);
-    this.loggedInUser = user.prno;
-    await this.getHMACENABLEorDISABLE();
-    await this.getToken();
-    this.fetchJsonFile('ar.json');
-    this.fetchJsonFile('en.json');
-    this.changeLanguage();
-    //this.getAttachment();
-    // Add scroll event listener when the component mounts
-    window.addEventListener('scroll', this.handleScroll);
-    console.log("scroll")
-    let searchTextfromStorage: any = localStorage.getItem("searchText");
-    console.log(searchTextfromStorage);
-    if (searchTextfromStorage == undefined || searchTextfromStorage === null || searchTextfromStorage === "") {
-      this.searchText = "0"
-    }
-    else {
-      this.searchText = searchTextfromStorage
-    }
+  let struser: any = localStorage.getItem('userinfo');
+  let user = JSON.parse(struser);
+  this.loggedInUser = user.prno;
 
+  await this.getHMACENABLEorDISABLE();
+  await this.getToken();
+  this.fetchJsonFile('ar.json');
+  this.fetchJsonFile('en.json');
+  this.changeLanguage();
 
+  window.addEventListener('scroll', this.handleScroll);
 
-    // Load initial set of ideas
-    setTimeout(() => {
-      this.getAllIdeas(0);
-    }, 1000);
-    // this.getAllIdeas(0);
-    this.getUserAttachment();
-    //this.getAttachmentById(829)
-    //className="modal fade e-backdrop"
-    this.checkGroupMembership();
+  
+  let searchTextfromStorage: any = localStorage.getItem("searchText");
+  console.log("searchText from storage:", searchTextfromStorage);
+
+  if (!searchTextfromStorage) {
+    this.searchText = "0"; 
+  } else {
+    this.searchText = searchTextfromStorage; 
   }
+
+  
+  setTimeout(() => {
+    this.getAllIdeas(0); // Will use this.searchText
+  }, 1000);
+
+  
+  localStorage.removeItem("searchText");
+
+  this.getUserAttachment();
+  this.checkGroupMembership();
+}
+
 
   fetchProfileAttachmentsFromComments = async (comments: any[]) => {
     const fetched = new Set(Object.keys(this.state.profileAttachments));
@@ -209,7 +212,7 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
       const commenterId = String(comment.submitteremailid);
       if (commenterId && !fetched.has(commenterId)) {
         fetched.add(commenterId);
-        await this.fetchAttachmentsForProfile(commenterId); // Your existing method for fetching images
+        await this.fetchAttachmentsForProfile(commenterId); 
       }
     }
   };
@@ -233,9 +236,9 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
         this.setState({ englishContent: data })
       }
       console.log(this.state.arabicContent, this.state.englishContent)
-      // Parse the JSON data
+      
 
-      // this.setState({ jsonData: data });
+      
     } catch (error) {
       console.error("Error fetching JSON file:", error);
     }
@@ -499,6 +502,7 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
         ideapath: 'ALL',
         innovationenablers: 'ALL',
         action: action,
+        filterbypage: "home",
         startnum: startnum,
         limit: this.state.limit,
         searchtext: this.searchText
@@ -576,7 +580,7 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
           }, []);
           this.setState({ uniqueIds: uniqueIds });
 
-          // ✅ Fix: Load and correct comment counts
+          //  Fix: Load and correct comment counts
           allIdeas.forEach((idea: any) => {
             this.getIdeaComment(idea.ideaid);
           });
@@ -1340,6 +1344,16 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
       //this.submitComment(ideaID);
     }
   }
+   public handleKeyPressIcon = (e: any, ideaID: any, ideaTitle: any, ideaOwner: any) => {
+
+    
+      if (this.state.comment == "") {
+        return false;
+      }
+      this.submitComment(ideaID, 0, 'ADD', ideaOwner, ideaTitle);
+      //this.submitComment(ideaID);
+    
+  }
 
   public getIdeaReplyComment = async (commentId: any) => {
     debugger;
@@ -1970,12 +1984,18 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
     console.log('Link copied to clipboard!');
     window.location.replace("https://dewa.sharepoint.com.mcas.ms/sites/qaideation/SitePages/Messages.aspx");
   }
+closeModal() {
+  // ✅ Reset to show all ideas
+  this.searchText = '0'; // or '' — depends on what your backend expects for "all ideas"
 
-  closeModal() {
-    this.searchText = 'ALL';
-    this.setState({ modalClass: 'modal fade e-backdrop', modalTime: 1 });
-    this.getAllIdeas(0);
-  }
+  // ✅ Optional: clear localStorage filter
+  localStorage.removeItem("searchText");
+
+  // ✅ Close the modal and refresh idea list
+  this.setState({ modalClass: 'modal fade e-backdrop', modalTime: 1, searchText: '' });
+  this.getAllIdeas(0);
+}
+
 
   public onChangeTitle(e: any, selctedOptions: any) {
     this.setState({
@@ -2905,6 +2925,8 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
                       <div className="col-lg-12 position-relative">
                         <a className="section-box-link">
                           <div className="h-border-box-outline mt-4">
+                           
+                            <div className='h-border-box-hover-grey'>
                             <div className="col-lg-12 p-0 cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
                               <div className="d-flex">
                                 <div className="flex-shrink-0">
@@ -3055,6 +3077,8 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
                             <div className="col-lg-12">
                               <hr className="border-topr" />
                             </div>
+                            </div>
+                             <div className='p16'>
 
                             <div className="col-lg-12">
                               <div className="clearfix">
@@ -3205,6 +3229,14 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
                                       }
                                       onKeyPress={(e) => this.handleKeyPress(e, item.ideaid, item.ideatitle, item.ideaowner)}
                                     />
+                                    <span className="input-send-comment">
+                                        <img
+                                          className="sentcomment-img"
+                                          src={SentComment}
+                                          alt="SentComment-pic"
+                                          onClick={(e)=>this.handleKeyPressIcon(e, item.ideaid, item.ideatitle, item.ideaowner)}
+                                        />
+                                    </span>
                                   </div>
                                 </div>
                                 {/* )} */}
@@ -3567,6 +3599,13 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
                                                 this.onChangeReplyComment(e, newValue)}
                                               onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid, item.ideaid)}
                                             />
+                                            <span className="input-send-comment">
+                                        <img
+                                          className="sentcomment-img"
+                                          src={SentComment}
+                                          alt="SentComment-pic"
+                                        />
+                                    </span>
                                           </div>
 
                                         </div>)}
@@ -3727,6 +3766,7 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
 
                               </div>
                             )}
+                            </div>
 
                           </div>
                         </a>
