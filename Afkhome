@@ -94,6 +94,7 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
 
     this.state = {
       isSuccess: false,
+      showexttraReplySpan:false,
       error: '',
       isInGroup: false,
       isLoader: true,
@@ -961,6 +962,8 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
     }
 
   }
+
+  
   public submitComment = async (ideaId: any, commentID: any = 0, action: any = "ADD", ideaOwner: any = "", ideaTitle: any = "") => {
     debugger;
     let apiResponse: any;
@@ -1360,7 +1363,7 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
     }
     this.submitComment(ideaID, 0, 'ADD', ideaOwner, ideaTitle);
     //this.submitComment(ideaID);
-    this.setState({showExtraSpan: false});
+    this.setState({ showExtraSpan: false });
 
   }
 
@@ -1764,7 +1767,12 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
     //this.getIdeaReplyComment(ideaCommentId,"callFromSubmitReply");
   }
   public onChangeReplyComment(e: any, selctedOptions: any) {
-    debugger;
+     const len = e.target.value?.length || 0;
+    if (len > 0) {
+      this.setState({ showexttraReplySpan: true })
+    } else {
+      this.setState({ showexttraReplySpan: false })
+    }
     this.setState({
       replyStage1Comment: selctedOptions
     });
@@ -1778,6 +1786,15 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
       this.setState({ ideaReply2CommentId: 0, CommentReplyId: 0 })
       this.SubmitReplyForIdeaComment(commentID, 0, ideaItemId, 'ADD');
     }
+  }
+  public handleKeyPressReplyCommentIcon = (e: any, commentID: any,ideaItemId: any) => {
+    if (this.state.replyStage1Comment == "") {
+      return false;
+    }
+    this.setState({ ideaReply2CommentId: 0, CommentReplyId: 0 })
+    this.SubmitReplyForIdeaComment(commentID, 0, ideaItemId, 'ADD');
+
+    this.setState({ showexttraReplySpan: false });
   }
 
   public toggleReplyShowtextBox = (editComment: any, ideaCommentId: any) => {
@@ -3237,20 +3254,20 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
                                         }
                                         onKeyPress={(e) => this.handleKeyPress(e, item.ideaid, item.ideatitle, item.ideaowner)}
                                       />
-                                     <span className="input-send-comment">
-                                       {this.state.showExtraSpan && (
-                                        <img
-                                          className="sentcomment-img"
-                                          src={SentComment}
-                                          alt="SentComment-pic"
-                                          onClick={(e) => this.handleKeyPressIcon(e, item.ideaid, item.ideatitle, item.ideaowner)}
-                                        />)}
+                                      <span className="input-send-comment">
+                                        {this.state.showExtraSpan && (
+                                          <img
+                                            className="sentcomment-img"
+                                            src={SentComment}
+                                            alt="SentComment-pic"
+                                            onClick={(e) => this.handleKeyPressIcon(e, item.ideaid, item.ideatitle, item.ideaowner)}
+                                          />)}
                                       </span>
 
                                     </div>
                                   </div>
                                   {/* )} */}
-                                 
+
                                   {this.currentCommentId == item.ideaid && this.state.commentList.map((commentItem: any) => (
 
                                     <div className="col-lg-12 position-relative" key={commentItem.commentid}>
@@ -3610,11 +3627,13 @@ export default class AfkHome extends React.Component<IAfkHomeProps, IAfkHomeStat
                                                 onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid, item.ideaid)}
                                               />
                                               <span className="input-send-comment">
-                                                <img
-                                                  className="sentcomment-img"
-                                                  src={SentComment}
-                                                  alt="SentComment-pic"
-                                                />
+                                                {this.state.showexttraReplySpan && (
+                                                  <img
+                                                    className="sentcomment-img"
+                                                    src={SentComment}
+                                                    alt="SentComment-pic"
+                                                    onClick={(e) => this.handleKeyPressReplyCommentIcon(e, commentItem.commentid, item.ideaid)}
+                                                  />)}
                                               </span>
                                             </div>
 
