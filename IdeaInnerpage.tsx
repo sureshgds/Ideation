@@ -7,6 +7,7 @@ import Infocircle from "./../assets/img/svg/info-circle-black-icon.png";
 import Voteicon from "./../assets/img/svg/vote-icon.png";
 import Replyellipsesicon from "./../assets/img/svg/ellipses-reply.png";
 import Bookmarkiconwhite from "./../assets/img/svg/bookmark-icon-filled-white.png";
+import SentComment from "./../assets/img/svg/send-comment.png";
 import ReactTooltip from 'react-tooltip';
 import "./../assets/css/afstyle.css";
 import "./../assets/js/bootstrap.bundle.min.js";
@@ -86,8 +87,9 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
     let params = new URLSearchParams(search);
     this.ideaID = params.get('ideaID');
     this.state = {
+      showExtraSpan: false,
+      showFullDesc: false,
       isSuccess: false,
-      isReadMore: false,
       isLoader: false,
       isDialogVisible: "",
       isSuccessDialogVisible: "",
@@ -161,6 +163,11 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
     }
     //this.fetchapproverole('Targetdivisionchampion');
   }
+
+  toggleDescription = () => {
+    this.setState({ showFullDesc: true });
+  };
+
   public submitBookmark = async (ideaId: any, isLike: any, isDisLike: any, isBookmark: any) => {
     this.setState({ isBookmarkModalOpen: true });
     let struser: any = localStorage.getItem('userinfo');
@@ -234,9 +241,6 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
       //   }
       // }, 3000);
     }
-  }
-  private handleReadMoreClick = () => {
-    this.setState({ isReadMore: !this.state.isReadMore });
   }
   private async checkGroupMembership(): Promise<void> {
     const { spHttpClient, siteUrl, currentUserLoginName } = this.props;
@@ -1317,9 +1321,24 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
   }
 
   public onChangeComment(e: any, selctedOptions: any) {
+      const len = e.target.value?.length || 0;
+    if (len > 0) {
+      this.setState({ showExtraSpan: true })
+    } else {
+      this.setState({ showExtraSpan: false })
+    }
     this.setState({
       comment: selctedOptions
     });
+  }
+    public handleKeyPressIcon = (e: any, ideaID: any) => {
+    if (this.state.comment == "") {
+      return false;
+    }
+    this.submitComment(ideaID);
+    //this.submitComment(ideaID);
+    this.setState({showExtraSpan: false});
+
   }
 
   public handleKeyPress = (e: any, ideaID: any) => {
@@ -1701,24 +1720,20 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
                     {this.state.ideaTitle}
                   </h2>
                   <h3 className="h-idea-heading" style={{ whiteSpace: 'pre-wrap' }}>
-                    {console.log("readmore", this.state.isReadMore)}
-                    {this.state.isReadMore ? (
-                      <div className='show-all-lines'>
-                        {this.state.ideaDesc.substring(0, 300)}
-                        <span className='p-readmore' onClick={() => this.handleReadMoreClick()}>Read less</span>
-                      </div>
-                    ) : (
-                      <div className='show-three-lines'>
-                        {this.state.ideaDesc}
-                        <span className='p-readmore' onClick={() => this.handleReadMoreClick()}>{langText.readmore}</span>
-                      </div>
-                    )}
-                    {/* <div className='show-three-lines'>
-                      {this.state.ideaDesc}
-                      <span className='p-readmore'>{langText.readmore}</span>
-                    </div> */}
-
+                    {this.state.ideaTitle}
                   </h3>
+
+                  <div className={this.state.showFullDesc ? "show-all-lines" : "show-three-lines"}>
+                    {this.state.ideaDesc}
+
+                    {!this.state.showFullDesc && (
+                      <span className="p-readmore" onClick={this.toggleDescription}>
+                        {langText.readmore}
+                      </span>
+                    )}
+                  </div>
+
+
                   <h5 className="grey-text02">
                     <img
                       src={Globeicon}
@@ -2165,6 +2180,15 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
                         onChange={(e, newValue) => this.onChangeComment(e, newValue)}
                         onKeyPress={(e) => this.handleKeyPress(e, this.ideaID)}
                       />
+                      <span className="input-send-comment">
+                        {this.state.showExtraSpan && (
+                          <img
+                            className="sentcomment-img"
+                            src={SentComment}
+                            alt="SentComment-pic"
+                            onClick={(e) => this.handleKeyPressIcon(e, this.ideaID)}
+                          />)}
+                      </span>
                     </div>
                   </div>)}
                 {this.state.commentList.map((commentItem: any) => (
@@ -2521,6 +2545,13 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
                                 this.onChangeReplyComment(e, newValue)}
                               onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid)}
                             />
+                            <span className="input-send-comment">
+                              <img
+                                className="sentcomment-img"
+                                src={SentComment}
+                                alt="SentComment-pic"
+                              />
+                            </span>
                           </div>
 
                         </div>
