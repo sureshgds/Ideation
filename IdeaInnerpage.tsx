@@ -88,6 +88,7 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
     this.ideaID = params.get('ideaID');
     this.state = {
       showExtraSpan: false,
+      showexttraReplySpan: false,
       showFullDesc: false,
       isSuccess: false,
       isLoader: false,
@@ -1321,7 +1322,7 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
   }
 
   public onChangeComment(e: any, selctedOptions: any) {
-      const len = e.target.value?.length || 0;
+    const len = e.target.value?.length || 0;
     if (len > 0) {
       this.setState({ showExtraSpan: true })
     } else {
@@ -1331,13 +1332,13 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
       comment: selctedOptions
     });
   }
-    public handleKeyPressIcon = (e: any, ideaID: any) => {
+  public handleKeyPressIcon = (e: any, ideaID: any) => {
     if (this.state.comment == "") {
       return false;
     }
     this.submitComment(ideaID);
     //this.submitComment(ideaID);
-    this.setState({showExtraSpan: false});
+    this.setState({ showExtraSpan: false });
 
   }
 
@@ -1448,7 +1449,12 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
   }
 
   public onChangeReplyComment(e: any, selctedOptions: any) {
-    debugger;
+    const len = e.target.value?.length || 0;
+    if (len > 0) {
+      this.setState({ showexttraReplySpan: true })
+    } else {
+      this.setState({ showexttraReplySpan: false })
+    }
     this.setState({
       replyComment: selctedOptions
     });
@@ -1461,6 +1467,14 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
       }
       this.SubmitReplyForIdeaComment(commentID);
     }
+  }
+  public handleKeyPressReplyCommentIcon = (e: any, commentID: any) => {
+    if (this.state.replyComment == "") {
+      return false;
+    }
+    this.SubmitReplyForIdeaComment(commentID);
+
+    this.setState({ showexttraReplySpan: false });
   }
 
   reportCommentId(ideaId: any, commentId: any) {
@@ -2546,11 +2560,13 @@ export default class AfkIdeainnerpage extends React.Component<IAfkIdeainnerpageP
                               onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid)}
                             />
                             <span className="input-send-comment">
-                              <img
-                                className="sentcomment-img"
-                                src={SentComment}
-                                alt="SentComment-pic"
-                              />
+                              {this.state.showexttraReplySpan && (
+                                <img
+                                  className="sentcomment-img"
+                                  src={SentComment}
+                                  alt="SentComment-pic"
+                                  onClick={(e) => this.handleKeyPressReplyCommentIcon(e, commentItem.commentid)}
+                                />)}
                             </span>
                           </div>
 
