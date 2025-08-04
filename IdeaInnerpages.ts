@@ -1,6 +1,7 @@
 export interface IAfkIdeainnerpageStates {
   isSuccess?: any;
   showExtraSpan: any;
+  showexttraReplySpan: any;
   isLoader?: any;
   isDialogVisible?: any;
   isSuccessDialogVisible?: any;
