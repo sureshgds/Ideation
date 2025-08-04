@@ -101,6 +101,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
     this.state = {
       isSuccess: false,
+      showexttraReplySpan: false,
       showExtraSpan: false,
       isLoader: true,
       isSuccessDialogVisible: false,
@@ -336,7 +337,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
   };
 
   public async getProcessListValues() {
-    debugger;
 
     let apiResponse: any;
     let responseData: any = [];
@@ -482,7 +482,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     }
   };
   public getallIdeasforexplore = async (startnum = 0, action = "", filter = "", actionWithCase = "") => {
-    // debugger;
+
     this.setState({ isLoader: true, allIdeaList: [], topFilter: filter, filterWithCase: actionWithCase == "" ? "Recent" : actionWithCase });
     let apiResponse: any;
     let responseData: any = [];
@@ -717,7 +717,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     }
   };
   public submitVote = async (ideaId: any, isLike: any, isDisLike: string, ideaOwner: any, ideaTitle: any, isbookmarked: any, isShare: any) => {
-    debugger;
     let apiResponse: any;
     let responseData: any = [];
     let struser: any = localStorage.getItem('userinfo');
@@ -783,7 +782,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
   }
   public submitComment = async (ideaId: any, commentID: any = 0, action: any = "ADD", ideaOwner: any = "", ideaTitle: any = "") => {
-    debugger;
     let apiResponse: any;
     let responseData: any = [];
     let struser: any = localStorage.getItem('userinfo');
@@ -872,7 +870,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     });
   }
   public submitVoteForComment = async (ideaId: any, commentId: any, isLike: string) => {
-    debugger;
     let apiResponse: any;
     let responseData: any = [];
     let struser: any = localStorage.getItem('userinfo');
@@ -930,7 +927,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
 
   public getIdeaComment = async (ideaId: any) => {
-    debugger;
     let apiResponse: any;
     let responseData: any = [];
     let struser: any = localStorage.getItem('userinfo');
@@ -1005,7 +1001,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     }
   }
   public getIdeaCommentVoteAndReplyCount = async (commentID: any) => {
-    debugger;
     let apiResponse: any;
     let responseData: any = [];
     let struser: any = localStorage.getItem('userinfo');
@@ -1056,7 +1051,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
   }
   public onChangeComment(e: any, selctedOptions: any) {
-     const len = e.target.value?.length || 0;
+    const len = e.target.value?.length || 0;
     if (len > 0) {
       this.setState({ showExtraSpan: true })
     } else {
@@ -1076,7 +1071,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       //this.getallIdeasforexplore(0, '', this.state.topFilter);
     }
   }
- public handleKeyPressIcon = (e: any, ideaID: any, ideaTitle: any, ideaOwner: any) => {
+  public handleKeyPressIcon = (e: any, ideaID: any, ideaTitle: any, ideaOwner: any) => {
 
 
     if (this.state.comment == "") {
@@ -1084,7 +1079,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     }
     this.submitComment(ideaID, 0, 'ADD', ideaOwner, ideaTitle);
     //this.submitComment(ideaID);
-    this.setState({showExtraSpan: false});
+    this.setState({ showExtraSpan: false });
 
   }
   public async getAttachment() {
@@ -1246,7 +1241,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     this.setState({ isDialogVisible: false });
   };
   public submitBookmark = async (ideaId: any, isLike: any, isDisLike: any, isBookmark: any) => {
-    debugger;
     this.setState({ isBookmarkModalOpen: true })
     let apiResponse: any;
     let responseData: any = [];
@@ -1316,7 +1310,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
   }
   public removeBookmark = async (ideaId: any, isLike: any, isDisLike: any) => {
-    debugger;
     let apiResponse: any;
     let responseData: any = [];
     let struser: any = localStorage.getItem('userinfo');
@@ -1410,7 +1403,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
   }
   public onChangeSearch(e: any, selctedOptions: any) {
-    debugger;
     this.setState({
       searchText: selctedOptions,
 
@@ -1442,7 +1434,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     });
   }
   public toggleReplyCommentShow = (ideaCommentId: any, ideaItemId: any) => {
-    debugger;
     this.setState(prevState => ({
       isReplyCommentShow: {
         ...prevState.isReplyCommentShow,
@@ -1453,7 +1444,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
   };
   public getIdeaCommentReply = async (commentId: any, ideaItemId: any) => {
     console.log(ideaItemId);
-    debugger;
     let apiResponse: any;
     let responseData: any = [];
     let struser: any = localStorage.getItem('userinfo');
@@ -1724,19 +1714,30 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
   }
   public onChangeReplyComment(e: any, selctedOptions: any) {
-    debugger;
+    const len = e.target.value?.length || 0;
+    if (len > 0) {
+      this.setState({ showexttraReplySpan: true })
+    } else {
+      this.setState({ showexttraReplySpan: false })
+    }
     this.setState({
       replyStage1Comment: selctedOptions
     });
   }
   public handleKeyPressReplyComment = (e: any, commentID: any, ideaItemId: any, title: any, owner: any) => {
-    debugger;
     if (e.key === 'Enter') {
       if (this.state.replyStage1Comment == "") {
         return false;
       }
       this.SubmitReplyForIdeaComment(commentID, 0, ideaItemId, 'ADD', owner, title);
     }
+  }
+  public handleKeyPressReplyCommentIcon = (e: any, commentID: any, ideaItemId: any, title: any, owner: any) => {
+    if (this.state.replyStage1Comment == "") {
+      return false;
+    }
+    this.SubmitReplyForIdeaComment(commentID, 0, ideaItemId, 'ADD', owner, title);
+    this.setState({ showexttraReplySpan: false });
   }
 
   public toggleReplyShowtextBox = (editComment: any, ideaCommentId: any) => {
@@ -1806,8 +1807,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     }
   }
   public toggleEditReplyShowtextBox = (ideaCommentId: any, CommentReplyId: any, comments: any) => {
-
-    debugger;
     this.setState(prevState => ({
       isReply2ShowtextBox: {
         ...prevState.isReply2ShowtextBox,
@@ -1881,7 +1880,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     const tempTextarea = document.createElement('textarea');
     tempTextarea.value = itemToCopy;
     document.body.appendChild(tempTextarea);
-    debugger;
     // Select and copy the item content
     tempTextarea.select();
     document.execCommand('copy');
@@ -1902,7 +1900,6 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     const tempTextarea = document.createElement('textarea');
     tempTextarea.value = itemToCopy;
     document.body.appendChild(tempTextarea);
-    debugger;
     // Select and copy the item content
     tempTextarea.select();
     document.execCommand('copy');
@@ -1973,7 +1970,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
   }
   public async callPowerAutomateForTranslate(text: any, ideaId: any, orgboo: any, by: any, commentid: any = 0) {
     try {
-      debugger;
+
 
 
       let url: any = "";
@@ -2686,12 +2683,12 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
                                   />
                                   <span className="input-send-comment">
                                     {this.state.showExtraSpan && (
-                                        <img
-                                          className="sentcomment-img"
-                                          src={SentComment}
-                                          alt="SentComment-pic"
-                                          onClick={(e) => this.handleKeyPressIcon(e, item.ideaid, item.ideatitle, item.ideaowner)}
-                                        />)}
+                                      <img
+                                        className="sentcomment-img"
+                                        src={SentComment}
+                                        alt="SentComment-pic"
+                                        onClick={(e) => this.handleKeyPressIcon(e, item.ideaid, item.ideatitle, item.ideaowner)}
+                                      />)}
                                   </span>
                                 </div>
                               </div>)}
@@ -3029,12 +3026,14 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
                                           onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid, item.ideaid, item.ideatitle, item.ideaowner)}
                                         />
                                         <span className="input-send-comment">
-                                    <img
-                                      className="sentcomment-img"
-                                      src={SentComment}
-                                      alt="SentComment-pic"
-                                    />
-                                  </span>
+                                          {this.state.showexttraReplySpan && (
+                                            <img
+                                              className="sentcomment-img"
+                                              src={SentComment}
+                                              alt="SentComment-pic"
+                                              onClick={(e) => this.handleKeyPressReplyCommentIcon(e, commentItem.commentid, item.ideaid, item.ideatitle, item.ideaowner)}
+                                            />)}
+                                        </span>
                                       </div>
 
                                     </div>)}
