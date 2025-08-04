@@ -1,7 +1,7 @@
 export interface IAfkIdeainnerpageStates {
   isSuccess?: any;
+  showExtraSpan: any;
   isLoader?: any;
-  isReadMore?: any
   isDialogVisible?: any;
   isSuccessDialogVisible?: any;
   errorDesciption?: any;
@@ -72,4 +72,5 @@ export interface IAfkIdeainnerpageStates {
   ideatype:any;
   value_chain:any;
   innovationenablers:any;
+  showFullDesc: any;
 }
