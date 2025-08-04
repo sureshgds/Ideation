@@ -9,6 +9,7 @@ import "./../assets/js/bootstrap.bundle.min.js";
 require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
 
 import Filtericon from "./../assets/img/svg/filter-icon.png";
+import SentComment from "./../assets/img/svg/send-comment.png";
 //import ProfileImg11 from "./../assets/img/profile-img11.jpg";
 import Globeicon from "./../assets/img/svg/globe-icon.png";
 import Implementedthumbsicon from "./../assets/img/svg/implemented-thumbs.png";
@@ -20,11 +21,13 @@ import Commenticon from "./../assets/img/svg/comment-icon.png";
 import Shareicon from "./../assets/img/svg/share-icon.png";
 import Downloadicon from "./../assets/img/svg/download-icon.png";
 import NoActionRequired from "./../assets/img/no-action-required.png";
-import { DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, 
+import {
+  DefaultButton, Dialog, DialogFooter, DialogType, Dropdown,
   //IStackTokens, 
-  SearchBox, 
+  SearchBox,
   //Stack, 
-  TextField } from '@fluentui/react';
+  TextField
+} from '@fluentui/react';
 import MIe02 from "./../assets/img/svg/modal/cancel-clipboard.png";
 import MIe01 from "./../assets/img/svg/modal/submitted-thumbs.png";
 import Commentreplyicon from "./../assets/img/svg/comment-reply-icon.png";
@@ -95,9 +98,10 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
   constructor(props: IAfkExploreProps, state: IAfkExploreStates) {
     super(props);
     this.IdeationServices = new IdeationAPIServices();
-  
+
     this.state = {
       isSuccess: false,
+      showExtraSpan: false,
       isLoader: true,
       isSuccessDialogVisible: false,
       isDialogVisible: false,
@@ -168,15 +172,15 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       designationList: {},
       lang: "en",
       class: "afkexplore-en",
-      recent:"",
-      implemented:"",
-      latestsubmissions:"",
-      oldsubmissions:"",
-      mostliked:"",
-      mostcomments:"",
-      englishContent:"",
-      arabicContent:"",
-      Recent:"",
+      recent: "",
+      implemented: "",
+      latestsubmissions: "",
+      oldsubmissions: "",
+      mostliked: "",
+      mostcomments: "",
+      englishContent: "",
+      arabicContent: "",
+      Recent: "",
     }
   }
 
@@ -192,32 +196,32 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     // Add scroll event listener when the component mounts
     window.addEventListener('scroll', this.handleScroll);
     // Load initial set of ideas
-   
+
 
   }
 
-  fetchJsonFile = async (fileName:any) => {
+  fetchJsonFile = async (fileName: any) => {
     try {
       // Specify the file path in the document library
       const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
-   
-      const filePath = "/sites/qaideation/SiteAssets/IdeationAssets/lang/"+fileName;
-     
+
+      const filePath = "/sites/qaideation/SiteAssets/IdeationAssets/lang/" + fileName;
+
       const file = await web.getFileByServerRelativeUrl(filePath).getText();
-     
+
       console.log(file);
       const data = JSON.parse(file);
-      console.log('Document Library Items:',data);
-      if(fileName == 'ar.json'){
-        this.setState({arabicContent:data})
+      console.log('Document Library Items:', data);
+      if (fileName == 'ar.json') {
+        this.setState({ arabicContent: data })
       }
-      else{
-        this.setState({englishContent:data})
+      else {
+        this.setState({ englishContent: data })
       }
-      console.log(this.state.arabicContent,this.state.englishContent)
+      console.log(this.state.arabicContent, this.state.englishContent)
       // Parse the JSON data
-     
-     // this.setState({ jsonData: data });
+
+      // this.setState({ jsonData: data });
     } catch (error) {
       console.error("Error fetching JSON file:", error);
     }
@@ -230,7 +234,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     let parsedlang = JSON.parse(lang);
     if (parsedlang.lang == "ar") {
       this.setState({
-        class: "afkexplore-ar", lang: "ar", recent:'حديث',implemented:'تنفيذ',latestsubmissions:'آخر تقديم', oldsubmissions:'التقديمات القديمة',mostliked:'الأكثر إعجابا',mostcomments:'معظم التعليقات',Recent:'حديث'
+        class: "afkexplore-ar", lang: "ar", recent: 'حديث', implemented: 'تنفيذ', latestsubmissions: 'آخر تقديم', oldsubmissions: 'التقديمات القديمة', mostliked: 'الأكثر إعجابا', mostcomments: 'معظم التعليقات', Recent: 'حديث'
         // errorMessage: 'رسالة خطأ', hasBeen: ' تم  ', byYOu: ' بواسطتك', successfully: 'بنجاح.', recordedVideo: 'فيديو مسجل',
         // successMessage: 'رسالة نجاح', unableTo: "غير قادرعلى", tryAgainlater: 'الرجاء المحاولة مرة اخرى لاحقاً', warningMessage: "رسالة تحذير", youHavealready: 'لديك بالفعل', thisidea: 'هذه الفكرة'
       });
@@ -238,15 +242,15 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       body.classList.add('global-ar');
       this.langCode = 14337;
       this.getAttachment();
-    this.getProcessListValues();
-    setTimeout(() => {
-      this.getallIdeasforexplore(0, 'ALL', 'ALL');
-    }, 1000);
-    this.getUserAttachment();
+      this.getProcessListValues();
+      setTimeout(() => {
+        this.getallIdeasforexplore(0, 'ALL', 'ALL');
+      }, 1000);
+      this.getUserAttachment();
     }
     else {
       this.setState({
-        class: "afkexplore-en", lang: "en",recent:'Recent',implemented:'Implemented',latestsubmissions:'Latest Submissions', oldsubmissions:'Old Submissions',mostliked:'Most Liked',mostcomments:'Most Comments',Recent:'Recent'
+        class: "afkexplore-en", lang: "en", recent: 'Recent', implemented: 'Implemented', latestsubmissions: 'Latest Submissions', oldsubmissions: 'Old Submissions', mostliked: 'Most Liked', mostcomments: 'Most Comments', Recent: 'Recent'
         // errorMessage: 'Error message', hasBeen: ' has been', byYOu: 'By you.', successfully: 'Successfully', recordedVideo: 'Recorded Video',
         // successMessage: 'Success Message', unableTo: 'Unable to ', tryAgainlater: '. Please try again later.', warningMessage: 'Warning message', youHavealready: 'You have already ', thisidea: 'this idea'
       });
@@ -254,11 +258,11 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       body.classList.add('global-en');
       this.langCode = 1033;
       this.getAttachment();
-    this.getProcessListValues();
-    setTimeout(() => {
-      this.getallIdeasforexplore(0, 'ALL', 'ALL');
-    }, 1000);
-    this.getUserAttachment();
+      this.getProcessListValues();
+      setTimeout(() => {
+        this.getallIdeasforexplore(0, 'ALL', 'ALL');
+      }, 1000);
+      this.getUserAttachment();
     }
 
   }
@@ -345,7 +349,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     const hmacValue = this.generateHMAC(jString, sK0y);
     let headers: any;
     let jtv: any = localStorage.getItem("Jtv");
-      let jtvparse = JSON.parse(jtv);
+    let jtvparse = JSON.parse(jtv);
     if (this.state.isHMAC == "Enable") {
       headers = {
         'headers': {
@@ -478,7 +482,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     }
   };
   public getallIdeasforexplore = async (startnum = 0, action = "", filter = "", actionWithCase = "") => {
-   // debugger;
+    // debugger;
     this.setState({ isLoader: true, allIdeaList: [], topFilter: filter, filterWithCase: actionWithCase == "" ? "Recent" : actionWithCase });
     let apiResponse: any;
     let responseData: any = [];
@@ -505,7 +509,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     const hmacValue = this.generateHMAC(jString, sK0y);
     let headers: any;
     let jtv: any = localStorage.getItem("Jtv");
-      let jtvparse = JSON.parse(jtv);
+    let jtvparse = JSON.parse(jtv);
     if (this.state.isHMAC == "Enable") {
       headers = {
         'headers': {
@@ -532,7 +536,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     dataList = responseData.data;
     if (dataList.length > 0) {
       console.log("allIdeaList", dataList);
-      for(let i=0; i<dataList.length;i++){
+      for (let i = 0; i < dataList.length; i++) {
         dataList[i].original = true;
         dataList[i].translated = false;
       }
@@ -590,7 +594,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       const jString = JSON.stringify(params);
       const hmacValue = this.generateHMAC(jString, sK0y);
       let headers: any;
-     
+
       if (this.state.isHMAC == "Enable") {
         headers = {
           'headers': {
@@ -598,7 +602,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
             Accept: 'application/json',
             'hmac-base64': hmacValue,
             'Authorization': `Bearer ${this.state.token}`,
-           
+
           }
         };
       }
@@ -621,12 +625,12 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       console.log("designation", designation, prno);
       List = [];
       //List.push({ Ideaowner: prno, designation: designation, name: nameEn, arname: namear })
-      if(this.state.lang == 'en'){
+      if (this.state.lang == 'en') {
         List.push({ Ideaowner: prno, designation: designation, name: nameEn, arname: namear })
-        }
-        if(this.state.lang == 'ar'){
-          List.push({ Ideaowner: prno, designation:  responseData.jobtitleinArabic, name: namear, arname: namear })
-          }
+      }
+      if (this.state.lang == 'ar') {
+        List.push({ Ideaowner: prno, designation: responseData.jobtitleinArabic, name: namear, arname: namear })
+      }
       //this.setState({ designationList: List });
       this.setState((prevState => ({
         designationList: {
@@ -760,20 +764,20 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       this.insertNotification("Voted for your idea - " + ideaTitle, "Vote", ideaId, ideaOwner, "Explore");
       console.log("SubmitVote Res", responseData.data);
       let dataList = this.state.allIdeaList.filter((a: any) => a.ideaid == ideaId);
-     let voteCount = isLike == 1 ? dataList[0].votecnt +1 : dataList[0].votecnt - 1;
-     this.setState((prevState) => ({
-      allIdeaList: prevState.allIdeaList.map((item: any) =>
-        item.ideaid === ideaId
-          ? {
-            ...item,
-            uservote: isLike,
-            userbookmark: isbookmarked,
-            votecnt : voteCount
+      let voteCount = isLike == 1 ? dataList[0].votecnt + 1 : dataList[0].votecnt - 1;
+      this.setState((prevState) => ({
+        allIdeaList: prevState.allIdeaList.map((item: any) =>
+          item.ideaid === ideaId
+            ? {
+              ...item,
+              uservote: isLike,
+              userbookmark: isbookmarked,
+              votecnt: voteCount
 
-          } // Add translatedText for the matched item
-          : item // Keep the other items unchanged
-      )
-    }));
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
       //this.getallIdeasforexplore(0, '', 'ALL');
     }
 
@@ -967,7 +971,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     let dataList: any = [];
     dataList = responseData.data;
     this.setState({ commentList: [] })
-    for(let i=0; i<dataList.length;i++){
+    for (let i = 0; i < dataList.length; i++) {
       dataList[i].original = true;
       //dataList[i].translated = false;
     }
@@ -1052,6 +1056,12 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
 
   }
   public onChangeComment(e: any, selctedOptions: any) {
+     const len = e.target.value?.length || 0;
+    if (len > 0) {
+      this.setState({ showExtraSpan: true })
+    } else {
+      this.setState({ showExtraSpan: false })
+    }
     this.setState({
       comment: selctedOptions
     });
@@ -1066,7 +1076,17 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
       //this.getallIdeasforexplore(0, '', this.state.topFilter);
     }
   }
+ public handleKeyPressIcon = (e: any, ideaID: any, ideaTitle: any, ideaOwner: any) => {
 
+
+    if (this.state.comment == "") {
+      return false;
+    }
+    this.submitComment(ideaID, 0, 'ADD', ideaOwner, ideaTitle);
+    //this.submitComment(ideaID);
+    this.setState({showExtraSpan: false});
+
+  }
   public async getAttachment() {
     const web: any = new Web("https://dewa.sharepoint.com/sites/qaideation/");
     //let columnName = "InnovationID";
@@ -1284,13 +1304,13 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
             ? {
               ...item,
               userbookmark: isBookmark
-  
+
             } // Add translatedText for the matched item
             : item // Keep the other items unchanged
         )
       }));
 
-     // this.getallIdeasforexplore(0, '', 'ALL');
+      // this.getallIdeasforexplore(0, '', 'ALL');
 
     }
 
@@ -1348,7 +1368,7 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
             ? {
               ...item,
               userbookmark: 0
-  
+
             } // Add translatedText for the matched item
             : item // Keep the other items unchanged
         )
@@ -1907,51 +1927,51 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
     this.setState({ dropdownClass: 'dropdown-menu show' })
   }
 
-  seeOrginal(text: any, ideaId: any,orgboo:any, by:any, commentid:any=0) {
-    let org = orgboo == true? false:true;
-    if(by == "byidea"){
-    this.setState((prevState) => ({
-      allIdeaList: prevState.allIdeaList.map((item: any) =>
-        item.ideaid === ideaId
-          ? {
-            ...item, translatedText: text,
-            ideatitle: item.translatedText,
-            original:org
-          } // Add translatedText for the matched item
-          : item // Keep the other items unchanged
-      )
-    }));
-    console.log(this.state.allIdeaList);
-  }
+  seeOrginal(text: any, ideaId: any, orgboo: any, by: any, commentid: any = 0) {
+    let org = orgboo == true ? false : true;
+    if (by == "byidea") {
+      this.setState((prevState) => ({
+        allIdeaList: prevState.allIdeaList.map((item: any) =>
+          item.ideaid === ideaId
+            ? {
+              ...item, translatedText: text,
+              ideatitle: item.translatedText,
+              original: org
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+      console.log(this.state.allIdeaList);
+    }
 
-  if(by == "bycomments"){
-    this.setState((prevState) => ({
-      commentList: prevState.commentList.map((item: any) =>
-        item.ideaid == ideaId && item.commentid == commentid
-          ? {
-            ...item, translatedText: text,
-            comments: item.translatedText,
-            original:org
-          } // Add translatedText for the matched item
-          : item // Keep the other items unchanged
-      )
-    }));
-    this.setState((prevState) => ({
-      allCommentList: prevState.allCommentList.map((item: any) =>
-        item.ideaid == ideaId && item.commentid == commentid
-          ? {
-            ...item, translatedText: text,
-            comments: item.translatedText,
-            original:org
-          } // Add translatedText for the matched item
-          : item // Keep the other items unchanged
-      )
-    }));
-    console.log(this.state.allCommentList);
-  }
+    if (by == "bycomments") {
+      this.setState((prevState) => ({
+        commentList: prevState.commentList.map((item: any) =>
+          item.ideaid == ideaId && item.commentid == commentid
+            ? {
+              ...item, translatedText: text,
+              comments: item.translatedText,
+              original: org
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+      this.setState((prevState) => ({
+        allCommentList: prevState.allCommentList.map((item: any) =>
+          item.ideaid == ideaId && item.commentid == commentid
+            ? {
+              ...item, translatedText: text,
+              comments: item.translatedText,
+              original: org
+            } // Add translatedText for the matched item
+            : item // Keep the other items unchanged
+        )
+      }));
+      console.log(this.state.allCommentList);
+    }
 
   }
-  public async callPowerAutomateForTranslate(text: any, ideaId: any,  orgboo:any, by:any, commentid:any=0) {
+  public async callPowerAutomateForTranslate(text: any, ideaId: any, orgboo: any, by: any, commentid: any = 0) {
     try {
       debugger;
 
@@ -1974,55 +1994,55 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
         const result = await resp.json();
         // alert("Successfully Flow triggered");
         console.log(result);
-        let org = orgboo == true? false:true;
+        let org = orgboo == true ? false : true;
         // Now, update the state to reflect the changes
-        if(by == "byidea"){
-        this.setState((prevState) => ({
-          allIdeaList: prevState.allIdeaList.map((item: any) =>
-            item.ideaid === ideaId
-              ? {
-                ...item, translatedText: text,
-                ideatitle: result.translatedText,
-                original:org
-              } // Add translatedText for the matched item
-              : item // Keep the other items unchanged
-          )
-        }));
-        console.log(this.state.allIdeaList);
-      }
+        if (by == "byidea") {
+          this.setState((prevState) => ({
+            allIdeaList: prevState.allIdeaList.map((item: any) =>
+              item.ideaid === ideaId
+                ? {
+                  ...item, translatedText: text,
+                  ideatitle: result.translatedText,
+                  original: org
+                } // Add translatedText for the matched item
+                : item // Keep the other items unchanged
+            )
+          }));
+          console.log(this.state.allIdeaList);
+        }
 
-      if(by == "bycomments"){
-        this.setState((prevState) => ({
-          commentList: prevState.commentList.map((item: any) =>
-            item.ideaid == ideaId && item.commentid == commentid
-              ? {
-                ...item, translatedText: text,
-                comments: result.translatedText,
-                original:org
-              } // Add translatedText for the matched item
-              : item // Keep the other items unchanged
-          )
-        }));
-        this.setState((prevState) => ({
-          allCommentList: prevState.allCommentList.map((item: any) =>
-            item.ideaid === ideaId && item.commentid === commentid
-              ? {
-                ...item, translatedText: text,
-                comments: result.translatedText,
-                original:org
-              } // Add translatedText for the matched item
-              : item // Keep the other items unchanged
-          )
-        }));
-        // this.setState(prevState => ({
-        //   commentList: this.initialComments,
-        //   isCommentLoadMore: this.isCommentMoreTwo,
-        //   allCommentList: this.commentdatalist,
-        //   comment: ""  }));
-        console.log("commentList", this.state.commentList);
-      }
-       
-    } else {
+        if (by == "bycomments") {
+          this.setState((prevState) => ({
+            commentList: prevState.commentList.map((item: any) =>
+              item.ideaid == ideaId && item.commentid == commentid
+                ? {
+                  ...item, translatedText: text,
+                  comments: result.translatedText,
+                  original: org
+                } // Add translatedText for the matched item
+                : item // Keep the other items unchanged
+            )
+          }));
+          this.setState((prevState) => ({
+            allCommentList: prevState.allCommentList.map((item: any) =>
+              item.ideaid === ideaId && item.commentid === commentid
+                ? {
+                  ...item, translatedText: text,
+                  comments: result.translatedText,
+                  original: org
+                } // Add translatedText for the matched item
+                : item // Keep the other items unchanged
+            )
+          }));
+          // this.setState(prevState => ({
+          //   commentList: this.initialComments,
+          //   isCommentLoadMore: this.isCommentMoreTwo,
+          //   allCommentList: this.commentdatalist,
+          //   comment: ""  }));
+          console.log("commentList", this.state.commentList);
+        }
+
+      } else {
         // Handle HTTP error status
         console.error(`Error: ${resp.status} - ${resp.statusText}`);
       }
@@ -2035,8 +2055,8 @@ export default class AfkExplore extends React.Component<IAfkExploreProps, IAfkEx
   }
 
   public render(): React.ReactElement<IAfkExploreProps> {
-// const langText = this.state.lang === "en" ? en : ar;
-const langText = this.state.lang === "en" ? this.state.englishContent:this.state.arabicContent;
+    // const langText = this.state.lang === "en" ? en : ar;
+    const langText = this.state.lang === "en" ? this.state.englishContent : this.state.arabicContent;
 
     return (
       <div className="col-lg-12 afk-explore">
@@ -2061,7 +2081,7 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                     width="24"
                     height="24"
                   />
-                 {/*<span className="badge bg-danger">{langText.nine}</span>*/}
+                  {/*<span className="badge bg-danger">{langText.nine}</span>*/}
                 </div>
               </div>
             </div>
@@ -2101,17 +2121,17 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                       <div className="row">
                         <div className="col-lg-12 p-0">
                           <div className="form-floating mb-3">
-                            
-                              <Dropdown
-                                className="form-select01 label-targetdivision"
-                                //placeholder={langText.selectanoption1}
-                                //label={langText.targetdivision}
-                                options={this.state.targetDivisionList}
-                                selectedKey={this.state.selectedTargetDivisionKey}
-                                onChange={(e, selctedOptions) => this.onChangeTargetDivision(e, selctedOptions)}
-                                styles={dropdownStyles}
-                              />
-                            
+
+                            <Dropdown
+                              className="form-select01 label-targetdivision"
+                              //placeholder={langText.selectanoption1}
+                              //label={langText.targetdivision}
+                              options={this.state.targetDivisionList}
+                              selectedKey={this.state.selectedTargetDivisionKey}
+                              onChange={(e, selctedOptions) => this.onChangeTargetDivision(e, selctedOptions)}
+                              styles={dropdownStyles}
+                            />
+
                           </div>
                         </div>
                       </div>
@@ -2119,17 +2139,17 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                       <div className="row">
                         <div className="col-lg-12 p-0">
                           <div className="form-floating mb-3">
-                            
-                              <Dropdown
-                                className="form-select01 label-benefit"
-                                //placeholder={langText.selectanoption1}
-                                //label={langText.benefit}
-                                options={this.state.benifitsList}
-                                selectedKey={this.state.selectedBenifitsKey}
-                                onChange={(e, selctedOptions) => this.onChangeBenifits(e, selctedOptions)}
-                                styles={dropdownStyles}
-                              />
-                            
+
+                            <Dropdown
+                              className="form-select01 label-benefit"
+                              //placeholder={langText.selectanoption1}
+                              //label={langText.benefit}
+                              options={this.state.benifitsList}
+                              selectedKey={this.state.selectedBenifitsKey}
+                              onChange={(e, selctedOptions) => this.onChangeBenifits(e, selctedOptions)}
+                              styles={dropdownStyles}
+                            />
+
                           </div>
                         </div>
                       </div>
@@ -2137,17 +2157,17 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                       <div className="row">
                         <div className="col-lg-12 p-0">
                           <div className="form-floating mb-3">
-                            
-                              <Dropdown
-                                className="form-select01 label-ideapath"
-                                //placeholder={langText.selectanoption1}
-                                //label={langText.ideapath}
-                                options={this.state.ideaPathList}
-                                selectedKey={this.state.selectedIdeaPathKey}
-                                onChange={(e, selctedOptions) => this.onChangeIdeaPath(e, selctedOptions)}
-                                styles={dropdownStyles}
-                              />
-                           
+
+                            <Dropdown
+                              className="form-select01 label-ideapath"
+                              //placeholder={langText.selectanoption1}
+                              //label={langText.ideapath}
+                              options={this.state.ideaPathList}
+                              selectedKey={this.state.selectedIdeaPathKey}
+                              onChange={(e, selctedOptions) => this.onChangeIdeaPath(e, selctedOptions)}
+                              styles={dropdownStyles}
+                            />
+
                           </div>
                         </div>
                       </div>
@@ -2155,17 +2175,17 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                       <div className="row">
                         <div className="col-lg-12 p-0">
                           <div className="form-floating mb-3">
-                           
-                              <Dropdown
-                                className="form-select01 label-innovationenablers"
-                                //placeholder={langText.selectanoption1}
-                                //label={langText.innovationenablers1}
-                                options={this.state.innovationEnablersList}
-                                selectedKey={this.state.selectedInnovationEnablersKey}
-                                onChange={(e, selctedOptions) => this.onChangeInnovationEnablers(e, selctedOptions)}
-                                styles={dropdownStyles}
-                              />
-                            
+
+                            <Dropdown
+                              className="form-select01 label-innovationenablers"
+                              //placeholder={langText.selectanoption1}
+                              //label={langText.innovationenablers1}
+                              options={this.state.innovationEnablersList}
+                              selectedKey={this.state.selectedInnovationEnablersKey}
+                              onChange={(e, selctedOptions) => this.onChangeInnovationEnablers(e, selctedOptions)}
+                              styles={dropdownStyles}
+                            />
+
                           </div>
                         </div>
                       </div>
@@ -2176,7 +2196,7 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                   <button
                     type="button"
                     className="btn btn-secondary m-btn"
-                   // data-bs-dismiss="modal"
+                    // data-bs-dismiss="modal"
                     onClick={() => this.clearALLFilter()}
                   >
                     {langText.clearall}
@@ -2253,16 +2273,16 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                   >
                     <strong>{this.state.filterWithCase}</strong>
                     <div className={this.state.dropdownClass} aria-labelledby="dropdownMenuButtonsmalldrop">
-                    <a onClick={() => this.getallIdeasforexplore(0, "RECENT", this.state.topFilter, this.state.recent)} className="dropdown-item" >
-                      {" "}
-                      {langText.recent}
-                    </a>
-                    <hr className="dropdown-divider" role="separator" />
-                    <a onClick={() => this.getallIdeasforexplore(0, "IMPLEMENTED", this.state.topFilter, this.state.implemented)} className="dropdown-item" >
-                      {" "}
-                      {langText.implemented}
-                    </a>
-                    {/* <hr className="dropdown-divider" role="separator" />
+                      <a onClick={() => this.getallIdeasforexplore(0, "RECENT", this.state.topFilter, this.state.recent)} className="dropdown-item" >
+                        {" "}
+                        {langText.recent}
+                      </a>
+                      <hr className="dropdown-divider" role="separator" />
+                      <a onClick={() => this.getallIdeasforexplore(0, "IMPLEMENTED", this.state.topFilter, this.state.implemented)} className="dropdown-item" >
+                        {" "}
+                        {langText.implemented}
+                      </a>
+                      {/* <hr className="dropdown-divider" role="separator" />
                     <a onClick={() => this.getallIdeasforexplore(0, "LATEST SUBMISSIONS", this.state.topFilter, this.state.latestsubmissions)} className="dropdown-item" href="#">
                       {" "}
                       {langText.latestsubmissions}
@@ -2272,42 +2292,42 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                       {" "}
                       {langText.oldsubmissions}
                     </a> */}
-                    <hr className="dropdown-divider" role="separator" />
-                    <a onClick={() => this.getallIdeasforexplore(0, "MOST LIKED", this.state.topFilter, this.state.mostliked)} className="dropdown-item" href="#">
-                      {" "}
-                      {langText.mostliked}
-                    </a>
-                    <hr className="dropdown-divider" role="separator" />
-                    <a onClick={() => this.getallIdeasforexplore(0, "MOST COMMENTS", this.state.topFilter, this.state.mostcomments)} className="dropdown-item" href="#">
-                      {" "}
-                      {langText.mostcomments}
-                    </a>
-                  </div>
+                      <hr className="dropdown-divider" role="separator" />
+                      <a onClick={() => this.getallIdeasforexplore(0, "MOST LIKED", this.state.topFilter, this.state.mostliked)} className="dropdown-item" href="#">
+                        {" "}
+                        {langText.mostliked}
+                      </a>
+                      <hr className="dropdown-divider" role="separator" />
+                      <a onClick={() => this.getallIdeasforexplore(0, "MOST COMMENTS", this.state.topFilter, this.state.mostcomments)} className="dropdown-item" href="#">
+                        {" "}
+                        {langText.mostcomments}
+                      </a>
+                    </div>
                   </a>
-                
+
                 </div>
               </div>
             </div>
           </div>
 
-          {(this.state.allIdeaList.length ==0&&!this.state.isLoader) && (
-       <div className="no-action-required">
-                          <div className="row m-0">
-                            <div className="col-lg-12 p-0 position-relative text-center">
-                              <img
-                                className="no-action-img"
-                                 src={NoActionRequired}
-                                alt="user pic"
-                              />
-                              <h4 className='mt-2'>
-                                {langText.noactionsrequired}
-                              </h4>
-                              <p className='mt-4'>{langText.Youreallcaughtupnothingneedsyourattentionrightnow}</p>
-                            </div>
-                          </div>
-                        </div>
+          {(this.state.allIdeaList.length == 0 && !this.state.isLoader) && (
+            <div className="no-action-required">
+              <div className="row m-0">
+                <div className="col-lg-12 p-0 position-relative text-center">
+                  <img
+                    className="no-action-img"
+                    src={NoActionRequired}
+                    alt="user pic"
+                  />
+                  <h4 className='mt-2'>
+                    {langText.noactionsrequired}
+                  </h4>
+                  <p className='mt-4'>{langText.Youreallcaughtupnothingneedsyourattentionrightnow}</p>
+                </div>
+              </div>
+            </div>
 
-)}
+          )}
 
           {this.state.allIdeaList.length > 0 && (
             <div>
@@ -2316,146 +2336,146 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                   <div className="col-lg-12 position-relative">
                     <div className="h-border-box-outline">
                       <div className='h-border-box-hover-grey'>
-                      <div className="col-lg-12 p-0 cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
-                        <div className="d-flex">
-                          <div className="flex-shrink-0">
-                            {this.state.profileAttachments[item.ideaowner] && this.state.profileAttachments[item.ideaowner].map((attachment: profileAttachment) => (
-                              <img
-                                className="profile-img03"
-                                src={attachment.imageUrl}
-                                alt="user pic"
-                              />))}
-                          </div>
-                          <div className="flex-grow-1 ms-3">
-                            <div className="row">
-                              <div className="col-lg-8">
-                                {this.state.designationList[item.ideaowner] && this.state.designationList[item.ideaowner].map((item: userDesignation) => (
-                                  <h4 className="profile-name-text01">{item.name}</h4>
-                                ))}
-                                {this.state.designationList[item.ideaowner] && this.state.designationList[item.ideaowner].map((item: userDesignation) => (
+                        <div className="col-lg-12 p-0 cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
+                          <div className="d-flex">
+                            <div className="flex-shrink-0">
+                              {this.state.profileAttachments[item.ideaowner] && this.state.profileAttachments[item.ideaowner].map((attachment: profileAttachment) => (
+                                <img
+                                  className="profile-img03"
+                                  src={attachment.imageUrl}
+                                  alt="user pic"
+                                />))}
+                            </div>
+                            <div className="flex-grow-1 ms-3">
+                              <div className="row">
+                                <div className="col-lg-8">
+                                  {this.state.designationList[item.ideaowner] && this.state.designationList[item.ideaowner].map((item: userDesignation) => (
+                                    <h4 className="profile-name-text01">{item.name}</h4>
+                                  ))}
+                                  {this.state.designationList[item.ideaowner] && this.state.designationList[item.ideaowner].map((item: userDesignation) => (
+                                    <h5 className="grey-text02">
+                                      {item.designation}
+                                    </h5>))}
                                   <h5 className="grey-text02">
-                                    {item.designation}
-                                  </h5>))}
-                                <h5 className="grey-text02">
-                                  <img
-                                    src={Globeicon}
-                                    alt="edit-icon"
-                                    width="12"
-                                    height="12"
-                                    className="float-start mt-1-5"
-                                  />
-                                  <span className="ms-2 mt-1 float-start">{this.formatDate(item.enteredon)}</span>{" "}
-                                  {/* <span className="mt-1 float-start">
+                                    <img
+                                      src={Globeicon}
+                                      alt="edit-icon"
+                                      width="12"
+                                      height="12"
+                                      className="float-start mt-1-5"
+                                    />
+                                    <span className="ms-2 mt-1 float-start">{this.formatDate(item.enteredon)}</span>{" "}
+                                    {/* <span className="mt-1 float-start">
                                   .ID: {this.getYearFromDate(item.enteredon)}-{item.ideaid}
                                 </span> */}
-                                </h5>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="float-end">
-                                  <button className="tt-a">
-                                    <span className="cursor-pointer badge rounded-pill text-dark bg-success">
-                                      <img
-                                        src={Implementedthumbsicon}
-                                        alt="edit-icon"
-                                        width="14"
-                                        height="14"
-                                      />
-                                      <span className="ms-1">
-                                        <a aria-current="page" href="#">
-                                          {/* Implemented */}
-                                          {this.state.filterWithCase}
-                                        </a>
+                                  </h5>
+                                </div>
+                                <div className="col-lg-4">
+                                  <div className="float-end">
+                                    <button className="tt-a">
+                                      <span className="cursor-pointer badge rounded-pill text-dark bg-success">
+                                        <img
+                                          src={Implementedthumbsicon}
+                                          alt="edit-icon"
+                                          width="14"
+                                          height="14"
+                                        />
+                                        <span className="ms-1">
+                                          <a aria-current="page" href="#">
+                                            {/* Implemented */}
+                                            {this.state.filterWithCase}
+                                          </a>
+                                        </span>
                                       </span>
-                                    </span>
-                                  </button>{" "}
+                                    </button>{" "}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="col-lg-12 p-0  cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
-                        <h3 className="h-idea-heading">
-                          
-                          <span className='rcs-text'>{item.ideatitle}</span>
-                          {item.original && (
-                                <span className='trans-text' onClick={() => this.callPowerAutomateForTranslate(item.ideatitle, item.ideaid, item.original,"byidea")}>{langText.seetranslation}</span>)}
-                                 {!item.original && ( 
-                                <span className='trans-text' onClick={() => this.seeOrginal(item.ideatitle, item.ideaid, item.original,"byidea")}>{langText.seeoriginal}</span>)}
-                           
-                        </h3>
-                      </div>
-                      <div className="col-lg-12 p-0  cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
-                        <ul className='himage-gallery'>
+                        <div className="col-lg-12 p-0  cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
+                          <h3 className="h-idea-heading">
 
-                          {/* {(await this.getAttachmentById(item.ideaid)).map((imageURL: any, index: any) => ( */}
-                          {/* {this.getImageURL(item.ideaid).map((imageURL: any, index: any) => (
+                            <span className='rcs-text'>{item.ideatitle}</span>
+                            {item.original && (
+                              <span className='trans-text' onClick={() => this.callPowerAutomateForTranslate(item.ideatitle, item.ideaid, item.original, "byidea")}>{langText.seetranslation}</span>)}
+                            {!item.original && (
+                              <span className='trans-text' onClick={() => this.seeOrginal(item.ideatitle, item.ideaid, item.original, "byidea")}>{langText.seeoriginal}</span>)}
+
+                          </h3>
+                        </div>
+                        <div className="col-lg-12 p-0  cursor-pointer" onClick={() => this.redirectInnerPage(item.ideaid)}>
+                          <ul className='himage-gallery'>
+
+                            {/* {(await this.getAttachmentById(item.ideaid)).map((imageURL: any, index: any) => ( */}
+                            {/* {this.getImageURL(item.ideaid).map((imageURL: any, index: any) => (
   <li>
     <img key={index} src={imageURL} alt={`Image ${index + 1}`} className="img-fluid mt-1 banner-img" />
   </li>
 ))} */}
-                          {this.state.attachments[item.ideaid] && this.state.attachments[item.ideaid].map((attachment: any) => (
-                            <>
-                              {attachment.map((attachment: any) => (
-                                <li>
-                                  {attachment.imageUrl != '' && (
-                                    <img key={attachment.imageUrl} src={attachment.imageUrl} alt="attachment" />
-                                  )}
+                            {this.state.attachments[item.ideaid] && this.state.attachments[item.ideaid].map((attachment: any) => (
+                              <>
+                                {attachment.map((attachment: any) => (
+                                  <li>
+                                    {attachment.imageUrl != '' && (
+                                      <img key={attachment.imageUrl} src={attachment.imageUrl} alt="attachment" />
+                                    )}
 
-                                  {attachment.videoUrl != '' && (
+                                    {attachment.videoUrl != '' && (
 
-                                    <ReactPlayer
-                                      url={attachment.videoUrl}
-                                      width="100%"
-                                      height="100%"
-                                      controls={true}
-                                    />
+                                      <ReactPlayer
+                                        url={attachment.videoUrl}
+                                        width="100%"
+                                        height="100%"
+                                        controls={true}
+                                      />
 
-                                  )}
-                                </li>
+                                    )}
+                                  </li>
 
-                              ))}</>
+                                ))}</>
 
-                          ))}
-                        </ul>
-                      </div>
+                            ))}
+                          </ul>
+                        </div>
 
-                      {/* download icon comes here */}
-                      <div className="col-lg-12">
-                        <ul className='download-sec-container'>
-                          {this.state.attachments[item.ideaid] && this.state.attachments[item.ideaid].map((attachment: any) => (
-                            <>
-                              {attachment.map((attachment: any) => (
-                                <li>
-                                  {attachment.pdfUrl != '' && (
-                                    <>
-                                      {/* <img src={hbanner10} alt="attachment" /> */}
-                                      <div className="col-lg-12 p-0 download-btn-section">
-                                        <div className="row justify-content-center">
-                                          <p className="col-4 vcs-text-dark text-center mt-3  mb-0 cursor-pointer">
-                                            <img
-                                              src={Downloadicon}
-                                              //src={hbanner10}
-                                              alt="edit-icon"
-                                              width="20"
-                                              height="20"
-                                              className='downloadicon-img'
-                                            />
-                                            <span className="ms-2 text-green" onClick={() => this.handleDownload(attachment.pdfUrl)}>{langText.download}</span>
-                                          </p>
+                        {/* download icon comes here */}
+                        <div className="col-lg-12">
+                          <ul className='download-sec-container'>
+                            {this.state.attachments[item.ideaid] && this.state.attachments[item.ideaid].map((attachment: any) => (
+                              <>
+                                {attachment.map((attachment: any) => (
+                                  <li>
+                                    {attachment.pdfUrl != '' && (
+                                      <>
+                                        {/* <img src={hbanner10} alt="attachment" /> */}
+                                        <div className="col-lg-12 p-0 download-btn-section">
+                                          <div className="row justify-content-center">
+                                            <p className="col-4 vcs-text-dark text-center mt-3  mb-0 cursor-pointer">
+                                              <img
+                                                src={Downloadicon}
+                                                //src={hbanner10}
+                                                alt="edit-icon"
+                                                width="20"
+                                                height="20"
+                                                className='downloadicon-img'
+                                              />
+                                              <span className="ms-2 text-green" onClick={() => this.handleDownload(attachment.pdfUrl)}>{langText.download}</span>
+                                            </p>
+                                          </div>
                                         </div>
-                                      </div>
-                                    </>
-                                  )}
-                                </li>
-                              ))}
-                            </>
-                          ))}
-                        </ul>
-                      </div>
-                      {/* download icon comes here */}
+                                      </>
+                                    )}
+                                  </li>
+                                ))}
+                              </>
+                            ))}
+                          </ul>
+                        </div>
+                        {/* download icon comes here */}
 
-                      {/* <div className="col-lg-12 mt-4-5">
+                        {/* <div className="col-lg-12 mt-4-5">
                         <div className="clearfix">
                           <div className="float-end">
                             {item.votecnt < 2 && (
@@ -2479,48 +2499,48 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                         </div>
                       </div> */}
 
-                      <div className="col-lg-12">
-                        <hr className="border-topr" />
+                        <div className="col-lg-12">
+                          <hr className="border-topr" />
+                        </div>
                       </div>
-                      </div>
 
-                       <div className='p16'>
+                      <div className='p16'>
 
-                      <div className="col-lg-12">
-                        <div className="clearfix">
-                          <div className="float-start">
-                            {item.uservote == "0" && (
-                              <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
-                                {this.loggedInUser != item.submitteremailid && (
-                                  <div onClick={() => this.submitVote(item.ideaid, "1", "0", item.enteredby, item.ideatitle, item.userbookmark, 0)} className="vote-icon">
-                                    {/* <span>{langText.vote}</span> */}
-                                    <span className="votechanging">vote ({item.votecnt})</span>
-                                  </div>)}
+                        <div className="col-lg-12">
+                          <div className="clearfix">
+                            <div className="float-start">
+                              {item.uservote == "0" && (
+                                <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                                  {this.loggedInUser != item.submitteremailid && (
+                                    <div onClick={() => this.submitVote(item.ideaid, "1", "0", item.enteredby, item.ideatitle, item.userbookmark, 0)} className="vote-icon">
+                                      {/* <span>{langText.vote}</span> */}
+                                      <span className="votechanging">vote ({item.votecnt})</span>
+                                    </div>)}
+                                </p>
+                              )}
+                              {item.uservote == "1" && (
+                                <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                                  {this.loggedInUser != item.submitteremailid && (
+                                    <div onClick={() => this.submitVote(item.ideaid, "0", "1", item.enteredby, item.ideatitle, item.userbookmark, 0)} className="vote-green-icon">
+                                      {/* <span>{langText.vote}d</span> */}
+                                      <span className="votechanging">vote ({item.votecnt})</span>
+                                    </div>)}
+                                </p>
+                              )}
+
+                              <p onClick={() => this.toggleCommentShow(item.ideaid)} className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
+                                <img
+                                  src={Commenticon}
+                                  alt="edit-icon"
+                                  width="20"
+                                  height="20"
+                                />
+                                {/* <span className="ms-2">{langText.comment}</span> */}
+                                <span className="ms-2">Comment ({item.commentcnt})</span>
                               </p>
-                            )}
-                            {item.uservote == "1" && (
-                              <p className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
-                                {this.loggedInUser != item.submitteremailid && (
-                                  <div onClick={() => this.submitVote(item.ideaid, "0", "1", item.enteredby, item.ideatitle, item.userbookmark, 0)} className="vote-green-icon">
-                                    {/* <span>{langText.vote}d</span> */}
-                                    <span className="votechanging">vote ({item.votecnt})</span>
-                                  </div>)}
-                              </p>
-                            )}
 
-                            <p onClick={() => this.toggleCommentShow(item.ideaid)} className="vcs-text-dark me-4 float-start mb-0 cursor-pointer">
-                              <img
-                                src={Commenticon}
-                                alt="edit-icon"
-                                width="20"
-                                height="20"
-                              />
-                              {/* <span className="ms-2">{langText.comment}</span> */}
-                              <span className="ms-2">Comment ({item.commentcnt})</span>
-                            </p>
-
-                            <p className="vcs-text-dark float-start mb-0 cursor-pointer share-drop">
-                              {/* <Dropdown>
+                              <p className="vcs-text-dark float-start mb-0 cursor-pointer share-drop">
+                                {/* <Dropdown>
                         <Dropdown.Toggle id="dropdown-recent">
                           <img
                             src={Shareicon}
@@ -2555,200 +2575,210 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                           </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown> */}
-                              <div className="dropdown">
-                                <a
-                                  className="btn btn-primary dropdown-toggle"
-                                  type="button"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <img
-                                    src={Shareicon}
-                                    alt="edit-icon"
-                                    width="20"
-                                    height="20"
-                                  />
-                                  
-                                  <span className="ms-2">share ({item.sharecnt})</span>
-                                  <div className="dropdown-menu">
-                                  <a className="dropdown-item" href="#">
+                                <div className="dropdown">
+                                  <a
+                                    className="btn btn-primary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                  >
                                     <img
-                                      src={Sharecopylinkicon}
+                                      src={Shareicon}
                                       alt="edit-icon"
-                                      width="24"
-                                      height="24"
+                                      width="20"
+                                      height="20"
                                     />
-                                    <span className="ms-2" onClick={() => this.handleCopy(item.ideaid, item.uservote, !item.uservote, item.ideaowner, item.ideatitle, item.userbookmark, 1)}>{langText.copylink}</span>
+
+                                    <span className="ms-2">share ({item.sharecnt})</span>
+                                    <div className="dropdown-menu">
+                                      <a className="dropdown-item" href="#">
+                                        <img
+                                          src={Sharecopylinkicon}
+                                          alt="edit-icon"
+                                          width="24"
+                                          height="24"
+                                        />
+                                        <span className="ms-2" onClick={() => this.handleCopy(item.ideaid, item.uservote, !item.uservote, item.ideaowner, item.ideatitle, item.userbookmark, 1)}>{langText.copylink}</span>
+                                      </a>
+                                      <hr className="dropdown-divider" role="separator" />
+                                      <a className="dropdown-item" href="#">
+                                        <img
+                                          src={Sharesenddirectlinkicon}
+                                          alt="edit-icon"
+                                          width="24"
+                                          height="24"
+                                        />
+                                        <span className="ms-2" onClick={() => this.redirectToMessage(item.ideaid, item.uservote, !item.uservote, item.ideaowner, item.ideatitle, item.userbookmark, 1)}>
+                                          {" "}
+                                          {langText.sendviadirectmessage}
+                                        </span>
+                                      </a>
+                                    </div>
                                   </a>
-                                  <hr className="dropdown-divider" role="separator" />
-                                  <a className="dropdown-item" href="#">
-                                    <img
-                                      src={Sharesenddirectlinkicon}
-                                      alt="edit-icon"
-                                      width="24"
-                                      height="24"
-                                    />
-                                    <span className="ms-2" onClick={() => this.redirectToMessage(item.ideaid, item.uservote, !item.uservote, item.ideaowner, item.ideatitle, item.userbookmark, 1)}>
-                                      {" "}
-                                      {langText.sendviadirectmessage}
-                                    </span>
-                                  </a>
+
                                 </div>
-                                </a>
-                               
-                              </div>
-                            </p>
-                          </div>
-                          <div className="float-end">
-                            {item.userbookmark == "0" && (
-                              <p className="vcs-text float-start mb-0 cursor-pointer" data-tip
-                                data-for="BookmarkTip">
-                                <a
-                                  className="bookmarks-icon"
-                                  onClick={() => this.submitBookmark(item.ideaid, item.uservote, !item.uservote, 1)}
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#Bookmarkmodal"
-                                />
                               </p>
-                            )}
-                            {item.userbookmark == "1" && (
-                              <p className="vcs-text float-start mb-0 cursor-pointer" data-tip
-                                data-for="RemoveBookmarkTip">
-                                <a
-                                  className="bookmarks-icon-black"
-                                  onClick={() => this.submitBookmark(item.ideaid, item.uservote, !item.uservote, 0)}
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#Bookmarkmodal"
-                                />
-                              </p>
-                            )}
-                            {item.userbookmark == "0" && (
-                              <ReactTooltip id="BookmarkTip" place="top" effect="solid">
-                                {langText.bookmark}
-                              </ReactTooltip>)}
-                            {item.userbookmark == "1" && (
-                              <ReactTooltip id="RemoveBookmarkTip" place="top" effect="solid">
-                                {langText.removebookmark}
-                              </ReactTooltip>)}
-                            <ReactTooltip id="ViewCampaignTip" place="top" effect="solid">
-                              {langText.viewcampaign}
-                            </ReactTooltip>
+                            </div>
+                            <div className="float-end">
+                              {item.userbookmark == "0" && (
+                                <p className="vcs-text float-start mb-0 cursor-pointer" data-tip
+                                  data-for="BookmarkTip">
+                                  <a
+                                    className="bookmarks-icon"
+                                    onClick={() => this.submitBookmark(item.ideaid, item.uservote, !item.uservote, 1)}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#Bookmarkmodal"
+                                  />
+                                </p>
+                              )}
+                              {item.userbookmark == "1" && (
+                                <p className="vcs-text float-start mb-0 cursor-pointer" data-tip
+                                  data-for="RemoveBookmarkTip">
+                                  <a
+                                    className="bookmarks-icon-black"
+                                    onClick={() => this.submitBookmark(item.ideaid, item.uservote, !item.uservote, 0)}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#Bookmarkmodal"
+                                  />
+                                </p>
+                              )}
+                              {item.userbookmark == "0" && (
+                                <ReactTooltip id="BookmarkTip" place="top" effect="solid">
+                                  {langText.bookmark}
+                                </ReactTooltip>)}
+                              {item.userbookmark == "1" && (
+                                <ReactTooltip id="RemoveBookmarkTip" place="top" effect="solid">
+                                  {langText.removebookmark}
+                                </ReactTooltip>)}
+                              <ReactTooltip id="ViewCampaignTip" place="top" effect="solid">
+                                {langText.viewcampaign}
+                              </ReactTooltip>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      {this.state.isCommentShow[item.ideaid] && (
-                        <div>
-                          {item.submitteremailid != this.loggedInUser && (
-                            <div className="col-lg-12 input-with-img">
-                              <div className="mb-3 mt-4 input-group">
-                                <span className="input-group-text" id="basic-addon1">
-                                {this.userImageUrl != '' && (
-                        <img
-                          className="profile-img02"
-                          src={this.userImageUrl}
-                          alt="user pic"
-                        />)}
-                      {this.userImageUrl == '' && (
-                        <img
-                          className="profile-img02"
-                          src={DummyProfileimg}
-                          alt="user pic"
-                        />)}
-                                </span>
-                                <TextField
-                                  placeholder={langText.shareyourthoughts}
-                                  className="form-control"
-                                  value={this.state.comment}
-                                  onChange={(e, newValue) =>
-                                    this.onChangeComment(e, newValue)
-                                  }
-                                  onKeyPress={(e) => this.handleKeyPress(e, item.ideaid, item.ideatitle, item.ideaowner)}
-                                />
-                              </div>
-                            </div>)}
-
-                          {this.state.commentList.map((commentItem: any) => (
-
-                            <div className="col-lg-12 position-relative" key={commentItem.commentid}>
-                              <div className="h-border-box-reply">
-                                <div className="col-lg-12 p-0">
-                                  <div className="d-flex">
-                                    <div className="flex-shrink-0">
-                                      {this.state.profileAttachments[commentItem.submitteremailid] && this.state.profileAttachments[commentItem.submitteremailid].map((attachment: profileAttachment) => (
+                        {this.state.isCommentShow[item.ideaid] && (
+                          <div>
+                            {item.submitteremailid != this.loggedInUser && (
+                              <div className="col-lg-12 input-with-img">
+                                <div className="mb-3 mt-4 input-group">
+                                  <span className="input-group-text" id="basic-addon1">
+                                    {this.userImageUrl != '' && (
+                                      <img
+                                        className="profile-img02"
+                                        src={this.userImageUrl}
+                                        alt="user pic"
+                                      />)}
+                                    {this.userImageUrl == '' && (
+                                      <img
+                                        className="profile-img02"
+                                        src={DummyProfileimg}
+                                        alt="user pic"
+                                      />)}
+                                  </span>
+                                  <TextField
+                                    placeholder={langText.shareyourthoughts}
+                                    className="form-control"
+                                    value={this.state.comment}
+                                    onChange={(e, newValue) =>
+                                      this.onChangeComment(e, newValue)
+                                    }
+                                    onKeyPress={(e) => this.handleKeyPress(e, item.ideaid, item.ideatitle, item.ideaowner)}
+                                  />
+                                  <span className="input-send-comment">
+                                    {this.state.showExtraSpan && (
                                         <img
-                                          className="profile-img04"
-                                          src={attachment.imageUrl}
-                                          alt="user pic"
-                                        />))}
-                                    </div>
-                                    <div className="flex-grow-1 ms-2">
-                                      <div className="row">
-                                        <div className="col-lg-8">
-                                          {this.state.designationList[commentItem.submitteremailid] && this.state.designationList[commentItem.submitteremailid].map((item: userDesignation) => (
-                                            <h4 className="profile-name-text02">
-                                              {item.name}
-                                            </h4>))}
-                                          {this.state.designationList[commentItem.submitteremailid] && this.state.designationList[commentItem.submitteremailid].map((item: userDesignation) => (
-                                            <h5 className="grey-text03">
-                                              {item.designation}
-                                            </h5>))}
-                                        </div>
-                                        <div className="col-lg-4">
-                                          <div className="float-end">
-                                            <h5 className="grey-text03  float-start">{this.formatTimeElapsed(commentItem.enteredon)}</h5>
-                                            <div className="small-drop-e float-start">
-                                              <div className="dropdown">
-                                                <a
-                                                  className="btn btn-secondary dropdown-toggle"
-                                                  type="button"
-                                                  data-bs-toggle="dropdown"
-                                                  aria-expanded="false"
-                                                >
-                                                  <img
-                                                    src={Replyellipsesicon}
-                                                    alt="edit-icon"
-                                                    width="24"
-                                                    height="24"
-                                                  />
-                                                   <div className="dropdown-menu">
-                                                  {this.loggedInUser.toLowerCase() == commentItem.submitteremailid.toLowerCase() && (
-                                                      <>
-                                                      <a onClick={() => this.submitComment(item.ideaid, commentItem.commentid, "DELETE", item.enteredby, item.ideatitle)} className="dropdown-item cursor-pointer" >
-                                                      <img
-                                        src={deletecomment}
-                                        alt="edit-icon"
-                                        width="24"
-                                        height="24"
-                                      />
-                                      <span className="ms-2 dc-red"> {langText.deletecomment}</span>
-                                                      </a>
-                                                      <hr
-                                                        className="dropdown-divider"
-                                                        role="separator"
-                                                      /></>)}
-                                                  {this.loggedInUser.toLowerCase() == commentItem.submitteremailid.toLowerCase() && (
-                                                  
-                                                      <>
-                                                      <a onClick={() => this.toggleReplyShowtextBox(commentItem.comments, commentItem.commentid)} className="dropdown-item cursor-pointer">
-                                                      <img
-                                        src={editcomment}
-                                        alt="edit-icon"
-                                        width="24"
-                                        height="24"
-                                      />
-                                      <span className="ms-2 dc-dark">  {langText.editcomment}</span>
-                                                      </a>
-                                                      <hr
-                                                        className="dropdown-divider"
-                                                        role="separator"
-                                                      /></>)}
-                                                  {this.loggedInUser.toLowerCase() != commentItem.submitteremailid.toLowerCase() && (
-                                                    <a className="dropdown-item cursor-pointer" onClick={() => this.reportCommentId(item.ideaid, commentItem.commentid, item.ideatitle, item.ideaowner, commentItem.comments)}>
-                                                      {langText.report}
-                                                    </a>)}
+                                          className="sentcomment-img"
+                                          src={SentComment}
+                                          alt="SentComment-pic"
+                                          onClick={(e) => this.handleKeyPressIcon(e, item.ideaid, item.ideatitle, item.ideaowner)}
+                                        />)}
+                                  </span>
+                                </div>
+                              </div>)}
+
+                            {this.state.commentList.map((commentItem: any) => (
+
+                              <div className="col-lg-12 position-relative" key={commentItem.commentid}>
+                                <div className="h-border-box-reply">
+                                  <div className="col-lg-12 p-0">
+                                    <div className="d-flex">
+                                      <div className="flex-shrink-0">
+                                        {this.state.profileAttachments[commentItem.submitteremailid] && this.state.profileAttachments[commentItem.submitteremailid].map((attachment: profileAttachment) => (
+                                          <img
+                                            className="profile-img04"
+                                            src={attachment.imageUrl}
+                                            alt="user pic"
+                                          />))}
+                                      </div>
+                                      <div className="flex-grow-1 ms-2">
+                                        <div className="row">
+                                          <div className="col-lg-8">
+                                            {this.state.designationList[commentItem.submitteremailid] && this.state.designationList[commentItem.submitteremailid].map((item: userDesignation) => (
+                                              <h4 className="profile-name-text02">
+                                                {item.name}
+                                              </h4>))}
+                                            {this.state.designationList[commentItem.submitteremailid] && this.state.designationList[commentItem.submitteremailid].map((item: userDesignation) => (
+                                              <h5 className="grey-text03">
+                                                {item.designation}
+                                              </h5>))}
+                                          </div>
+                                          <div className="col-lg-4">
+                                            <div className="float-end">
+                                              <h5 className="grey-text03  float-start">{this.formatTimeElapsed(commentItem.enteredon)}</h5>
+                                              <div className="small-drop-e float-start">
+                                                <div className="dropdown">
+                                                  <a
+                                                    className="btn btn-secondary dropdown-toggle"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-expanded="false"
+                                                  >
+                                                    <img
+                                                      src={Replyellipsesicon}
+                                                      alt="edit-icon"
+                                                      width="24"
+                                                      height="24"
+                                                    />
+                                                    <div className="dropdown-menu">
+                                                      {this.loggedInUser.toLowerCase() == commentItem.submitteremailid.toLowerCase() && (
+                                                        <>
+                                                          <a onClick={() => this.submitComment(item.ideaid, commentItem.commentid, "DELETE", item.enteredby, item.ideatitle)} className="dropdown-item cursor-pointer" >
+                                                            <img
+                                                              src={deletecomment}
+                                                              alt="edit-icon"
+                                                              width="24"
+                                                              height="24"
+                                                            />
+                                                            <span className="ms-2 dc-red"> {langText.deletecomment}</span>
+                                                          </a>
+                                                          <hr
+                                                            className="dropdown-divider"
+                                                            role="separator"
+                                                          /></>)}
+                                                      {this.loggedInUser.toLowerCase() == commentItem.submitteremailid.toLowerCase() && (
+
+                                                        <>
+                                                          <a onClick={() => this.toggleReplyShowtextBox(commentItem.comments, commentItem.commentid)} className="dropdown-item cursor-pointer">
+                                                            <img
+                                                              src={editcomment}
+                                                              alt="edit-icon"
+                                                              width="24"
+                                                              height="24"
+                                                            />
+                                                            <span className="ms-2 dc-dark">  {langText.editcomment}</span>
+                                                          </a>
+                                                          <hr
+                                                            className="dropdown-divider"
+                                                            role="separator"
+                                                          /></>)}
+                                                      {this.loggedInUser.toLowerCase() != commentItem.submitteremailid.toLowerCase() && (
+                                                        <a className="dropdown-item cursor-pointer" onClick={() => this.reportCommentId(item.ideaid, commentItem.commentid, item.ideatitle, item.ideaowner, commentItem.comments)}>
+                                                          {langText.report}
+                                                        </a>)}
+                                                    </div>
+                                                  </a>
+
                                                 </div>
-                                                </a>
-                                               
                                               </div>
                                             </div>
                                           </div>
@@ -2756,50 +2786,49 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                                       </div>
                                     </div>
                                   </div>
-                                </div>
-                                <div className="col-lg-12 p-3 grey-box-reply mt-2">
-                                  {(!this.state.isReplyShowtextBox[commentItem.commentid] &&
-                                    <h3 className="h-idea-heading-reply mb-0">
-                                     
-                                      <span className='rcs-text'> {commentItem.comments}</span>
-                                      {commentItem.original && (
-                                               <span className='trans-text' onClick={() => this.callPowerAutomateForTranslate(commentItem.comments, item.ideaid, item.original,"bycomments",commentItem.commentid)}>{langText.seetranslation}</span>
-                                            )}
-                                            {!commentItem.original && (
-                                            <span className='trans-text' onClick={() => this.seeOrginal(commentItem.comments, item.ideaid, item.original,"bycomments",commentItem.commentid)}>{langText.seeoriginal}</span>)}
-                                        
-                                    </h3>)}
-                                  {(this.state.isReplyShowtextBox[commentItem.commentid] &&
-                                    <TextField
-                                      placeholder={langText.editcomment}
-                                      aria-label="Username"
-                                      aria-describedby="basic-addon1"
-                                      className="form-control"
-                                      value={this.state.editComment}
-                                      onChange={(e, newValue) => this.onChangeEditComment(e, newValue)}
-                                      onKeyPress={(e) => this.handleKeyPressEditComment(e, item.ideaid, commentItem.commentid)}
-                                    />)}
-                                </div>
+                                  <div className="col-lg-12 p-3 grey-box-reply mt-2">
+                                    {(!this.state.isReplyShowtextBox[commentItem.commentid] &&
+                                      <h3 className="h-idea-heading-reply mb-0">
 
-                                <div className="col-lg-12 mt-3">
-                                  <div className="clearfix">
-                                    <div className="float-start">
-                                      {commentItem.uservotecount == "0" && (
-                                        <p className="vcs-text-dark me-3 float-start mb-0 cursor-pointer">
-                                          <div onClick={() => this.submitVoteForComment(item.ideaid, commentItem.commentid, "1")} className="vote-icon">
-                                            <span >{commentItem.votecount}</span>
-                                          </div>
+                                        <span className='rcs-text'> {commentItem.comments}</span>
+                                        {commentItem.original && (
+                                          <span className='trans-text' onClick={() => this.callPowerAutomateForTranslate(commentItem.comments, item.ideaid, item.original, "bycomments", commentItem.commentid)}>{langText.seetranslation}</span>
+                                        )}
+                                        {!commentItem.original && (
+                                          <span className='trans-text' onClick={() => this.seeOrginal(commentItem.comments, item.ideaid, item.original, "bycomments", commentItem.commentid)}>{langText.seeoriginal}</span>)}
 
-                                        </p>
-                                      )}
-                                      {commentItem.uservotecount == "1" && (
-                                        <p className="vcs-text-dark me-3 float-start mb-0 cursor-pointer">
-                                          <div onClick={() => this.submitVoteForComment(item.ideaid, commentItem.commentid, "0")} className="vote-green-icon">
-                                            <span>{commentItem.votecount}</span>
-                                          </div>
-                                        </p>
-                                      )}
-                                      {/* <p className="vcs-text-dark me-3 ms-3 float-start mb-0 cursor-pointer">
+                                      </h3>)}
+                                    {(this.state.isReplyShowtextBox[commentItem.commentid] &&
+                                      <TextField
+                                        placeholder={langText.editcomment}
+                                        aria-label="Username"
+                                        aria-describedby="basic-addon1"
+                                        className="form-control"
+                                        value={this.state.editComment}
+                                        onChange={(e, newValue) => this.onChangeEditComment(e, newValue)}
+                                        onKeyPress={(e) => this.handleKeyPressEditComment(e, item.ideaid, commentItem.commentid)}
+                                      />)}
+                                  </div>
+
+                                  <div className="col-lg-12 mt-3">
+                                    <div className="clearfix">
+                                      <div className="float-start">
+                                        {commentItem.uservotecount == "0" && (
+                                          <p className="vcs-text-dark me-3 float-start mb-0 cursor-pointer">
+                                            <div onClick={() => this.submitVoteForComment(item.ideaid, commentItem.commentid, "1")} className="vote-icon">
+                                              <span >{commentItem.votecount}</span>
+                                            </div>
+
+                                          </p>
+                                        )}
+                                        {commentItem.uservotecount == "1" && (
+                                          <p className="vcs-text-dark me-3 float-start mb-0 cursor-pointer">
+                                            <div onClick={() => this.submitVoteForComment(item.ideaid, commentItem.commentid, "0")} className="vote-green-icon">
+                                              <span>{commentItem.votecount}</span>
+                                            </div>
+                                          </p>
+                                        )}
+                                        {/* <p className="vcs-text-dark me-3 ms-3 float-start mb-0 cursor-pointer">
                                             <img
                                               src={Voteicon}
                                               alt="edit-icon"
@@ -2808,120 +2837,121 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                                             />
                                             <span className="ms-2">{commentItem.votecount}</span>
                                           </p> */}
-                                      <p className="vcs-text-dark float-start mb-0 cursor-pointer" onClick={() => this.getIdeaCommentReply(commentItem.commentid, item.ideaid)}>
-                                        <img
-                                          src={Commentreplyicon}
-                                          alt="edit-icon"
-                                          width="20"
-                                          height="20"
-                                        />
-                                        {commentItem.repliescount < 2 && (
-                                          <span className="ms-2">{commentItem.repliescount} {langText.reply}</span>
-                                        )}
-                                        {commentItem.repliescount >= 2 && (
-                                          <span className="ms-2">{commentItem.repliescount} {langText.replies}</span>
-                                        )}
-                                      </p>
-                                    </div>
-                                    <div className="float-end">
-                                      <p className="vcs-text-dark float-start mb-0 cursor-pointer" onClick={() => this.toggleReplyCommentShow(commentItem.commentid, item.ideaid)}>
-                                        <span className="ms-2">{langText.reply1}</span>
-                                      </p>
+                                        <p className="vcs-text-dark float-start mb-0 cursor-pointer" onClick={() => this.getIdeaCommentReply(commentItem.commentid, item.ideaid)}>
+                                          <img
+                                            src={Commentreplyicon}
+                                            alt="edit-icon"
+                                            width="20"
+                                            height="20"
+                                          />
+                                          {commentItem.repliescount < 2 && (
+                                            <span className="ms-2">{commentItem.repliescount} {langText.reply}</span>
+                                          )}
+                                          {commentItem.repliescount >= 2 && (
+                                            <span className="ms-2">{commentItem.repliescount} {langText.replies}</span>
+                                          )}
+                                        </p>
+                                      </div>
+                                      <div className="float-end">
+                                        <p className="vcs-text-dark float-start mb-0 cursor-pointer" onClick={() => this.toggleReplyCommentShow(commentItem.commentid, item.ideaid)}>
+                                          <span className="ms-2">{langText.reply1}</span>
+                                        </p>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                              {/* {this.state.isReplyCommentShow[commentItem.commentid] && ( */}
-                              <div className="col-lg-12 padding-rpy">
+                                {/* {this.state.isReplyCommentShow[commentItem.commentid] && ( */}
+                                <div className="col-lg-12 padding-rpy">
 
-                                {this.state.replyStage1CommentList[commentItem.commentid] && this.state.replyStage1CommentList[commentItem.commentid].map((replyStage1CommentItem: any) => (
-                                  <div className="col-lg-12 position-relative mt-5">
-                                    <div className="h-border-box-reply">
-                                      <div className="col-lg-12 p-0">
-                                        <div className="d-flex">
-                                          <div className="flex-shrink-0">
-                                            {this.state.profileAttachments[replyStage1CommentItem.submitteremailid] && this.state.profileAttachments[replyStage1CommentItem.submitteremailid].map((attachment: profileAttachment) => (
-                                              <img
-                                                className="profile-img04"
-                                                src={attachment.imageUrl}
-                                                alt="user pic"
-                                              />))}
-                                          </div>
-                                          <div className="flex-grow-1 ms-2">
-                                            <div className="row">
-                                              <div className="col-lg-8">
-                                                {this.state.designationList[replyStage1CommentItem.submitteremailid] && this.state.designationList[replyStage1CommentItem.submitteremailid].map((item: userDesignation) => (
-                                                  <h4 className="profile-name-text02">
-                                                    {item.name}
-                                                  </h4>))}
-                                                {this.state.designationList[replyStage1CommentItem.submitteremailid] && this.state.designationList[replyStage1CommentItem.submitteremailid].map((item: userDesignation) => (
-                                                  <h5 className="grey-text03">
-                                                    {item.designation}
-                                                  </h5>))}
-                                              </div>
-                                              <div className="col-lg-4">
-                                                <div className="float-end">
-                                                  <h5 className="grey-text03  float-start">
-                                                    {this.formatDate(replyStage1CommentItem.enteredon)}
-                                                  </h5>
-                                                  <div className="small-drop-e float-start">
+                                  {this.state.replyStage1CommentList[commentItem.commentid] && this.state.replyStage1CommentList[commentItem.commentid].map((replyStage1CommentItem: any) => (
+                                    <div className="col-lg-12 position-relative mt-5">
+                                      <div className="h-border-box-reply">
+                                        <div className="col-lg-12 p-0">
+                                          <div className="d-flex">
+                                            <div className="flex-shrink-0">
+                                              {this.state.profileAttachments[replyStage1CommentItem.submitteremailid] && this.state.profileAttachments[replyStage1CommentItem.submitteremailid].map((attachment: profileAttachment) => (
+                                                <img
+                                                  className="profile-img04"
+                                                  src={attachment.imageUrl}
+                                                  alt="user pic"
+                                                />))}
+                                            </div>
+                                            <div className="flex-grow-1 ms-2">
+                                              <div className="row">
+                                                <div className="col-lg-8">
+                                                  {this.state.designationList[replyStage1CommentItem.submitteremailid] && this.state.designationList[replyStage1CommentItem.submitteremailid].map((item: userDesignation) => (
+                                                    <h4 className="profile-name-text02">
+                                                      {item.name}
+                                                    </h4>))}
+                                                  {this.state.designationList[replyStage1CommentItem.submitteremailid] && this.state.designationList[replyStage1CommentItem.submitteremailid].map((item: userDesignation) => (
+                                                    <h5 className="grey-text03">
+                                                      {item.designation}
+                                                    </h5>))}
+                                                </div>
+                                                <div className="col-lg-4">
+                                                  <div className="float-end">
+                                                    <h5 className="grey-text03  float-start">
+                                                      {this.formatDate(replyStage1CommentItem.enteredon)}
+                                                    </h5>
+                                                    <div className="small-drop-e float-start">
 
-                                                    <div className="dropdown">
-                                                      <a
-                                                        className="btn btn-secondary dropdown-toggle"
-                                                        type="button"
-                                                        data-bs-toggle="dropdown"
-                                                        aria-expanded="false"
-                                                      >
-                                                        <img
-                                                          src={Replyellipsesicon}
-                                                          alt="edit-icon"
-                                                          width="24"
-                                                          height="24"
-                                                        />
-                                                        <div className="dropdown-menu">
-                                                        {this.loggedInUser.toLowerCase() == replyStage1CommentItem.submitteremailid.toLowerCase() && (
-                                                           <>
-                                                           <a className="dropdown-item"
-                                                             onClick={() => this.SubmitReplyForIdeaComment(commentItem.commentid, replyStage1CommentItem.repliesid, item.ideaid, "DELETE")}>
-                                                               <img
-                                        src={deletecomment}
-                                        alt="edit-icon"
-                                        width="24"
-                                        height="24"
-                                      />
-                                      <span className="ms-2 dc-red"> {langText.deletecomment}</span>
-                                                            
-                                                           </a>
-                                                            <hr
-                                                              className="dropdown-divider"
-                                                              role="separator"
-                                                            /></>)}
-                                                        {this.loggedInUser.toLowerCase() == replyStage1CommentItem.submitteremailid.toLowerCase() && (
-                                                         
-                                                            <>
-                                                            <a className="dropdown-item"
-                                                              onClick={() => this.toggleEditReplyShowtextBox(commentItem.commentid, replyStage1CommentItem.repliesid, replyStage1CommentItem.comments)}>
-                                                             <img
-                                        src={editcomment}
-                                        alt="edit-icon"
-                                        width="24"
-                                        height="24"
-                                      />
-                                      <span className="ms-2 dc-dark">  {langText.editcomment}</span>
-                                                            </a>
-                                                            <hr
-                                                              className="dropdown-divider"
-                                                              role="separator"
-                                                            /></>)}
-                                                        {this.loggedInUser.toLowerCase() != replyStage1CommentItem.submitteremailid.toLowerCase() && (
-                                                          <a className="dropdown-item"
-                                                            onClick={() => this.reportStage2CommentId(item.ideaid, commentItem.commentid, replyStage1CommentItem.repliesid, item.ideatitle, item.ideaowner, replyStage1CommentItem.comments)}>
-                                                            {langText.report}
-                                                          </a>)}
+                                                      <div className="dropdown">
+                                                        <a
+                                                          className="btn btn-secondary dropdown-toggle"
+                                                          type="button"
+                                                          data-bs-toggle="dropdown"
+                                                          aria-expanded="false"
+                                                        >
+                                                          <img
+                                                            src={Replyellipsesicon}
+                                                            alt="edit-icon"
+                                                            width="24"
+                                                            height="24"
+                                                          />
+                                                          <div className="dropdown-menu">
+                                                            {this.loggedInUser.toLowerCase() == replyStage1CommentItem.submitteremailid.toLowerCase() && (
+                                                              <>
+                                                                <a className="dropdown-item"
+                                                                  onClick={() => this.SubmitReplyForIdeaComment(commentItem.commentid, replyStage1CommentItem.repliesid, item.ideaid, "DELETE")}>
+                                                                  <img
+                                                                    src={deletecomment}
+                                                                    alt="edit-icon"
+                                                                    width="24"
+                                                                    height="24"
+                                                                  />
+                                                                  <span className="ms-2 dc-red"> {langText.deletecomment}</span>
+
+                                                                </a>
+                                                                <hr
+                                                                  className="dropdown-divider"
+                                                                  role="separator"
+                                                                /></>)}
+                                                            {this.loggedInUser.toLowerCase() == replyStage1CommentItem.submitteremailid.toLowerCase() && (
+
+                                                              <>
+                                                                <a className="dropdown-item"
+                                                                  onClick={() => this.toggleEditReplyShowtextBox(commentItem.commentid, replyStage1CommentItem.repliesid, replyStage1CommentItem.comments)}>
+                                                                  <img
+                                                                    src={editcomment}
+                                                                    alt="edit-icon"
+                                                                    width="24"
+                                                                    height="24"
+                                                                  />
+                                                                  <span className="ms-2 dc-dark">  {langText.editcomment}</span>
+                                                                </a>
+                                                                <hr
+                                                                  className="dropdown-divider"
+                                                                  role="separator"
+                                                                /></>)}
+                                                            {this.loggedInUser.toLowerCase() != replyStage1CommentItem.submitteremailid.toLowerCase() && (
+                                                              <a className="dropdown-item"
+                                                                onClick={() => this.reportStage2CommentId(item.ideaid, commentItem.commentid, replyStage1CommentItem.repliesid, item.ideatitle, item.ideaowner, replyStage1CommentItem.comments)}>
+                                                                {langText.report}
+                                                              </a>)}
+                                                          </div>
+                                                        </a>
+
                                                       </div>
-                                                      </a>
-                                                      
                                                     </div>
                                                   </div>
                                                 </div>
@@ -2929,27 +2959,26 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                                             </div>
                                           </div>
                                         </div>
-                                      </div>
-                                      <div className="col-lg-12 p-3 grey-box-reply mt-2">
-                                        {(!this.state.isReply2ShowtextBox[replyStage1CommentItem.repliesid] &&
-                                          <h3 className="h-idea-heading-reply mb-0">
-                                            {replyStage1CommentItem.comments}{" "}
-                                          </h3>)}
-                                        {(this.state.isReply2ShowtextBox[replyStage1CommentItem.repliesid] &&
-                                          <TextField
-                                            placeholder={langText.editcomment}
-                                            aria-label="Username"
-                                            aria-describedby="basic-addon1"
-                                            className="form-control"
-                                            value={this.state.editReplyComment}
-                                            onChange={(e, newValue) => this.onChangeReplyEditComment(e, newValue)}
-                                            onKeyPress={(e) => this.handleKeyPressReplyEditComment(e, commentItem.commentid, replyStage1CommentItem.repliesid)}
-                                          />)}
-                                      </div>
+                                        <div className="col-lg-12 p-3 grey-box-reply mt-2">
+                                          {(!this.state.isReply2ShowtextBox[replyStage1CommentItem.repliesid] &&
+                                            <h3 className="h-idea-heading-reply mb-0">
+                                              {replyStage1CommentItem.comments}{" "}
+                                            </h3>)}
+                                          {(this.state.isReply2ShowtextBox[replyStage1CommentItem.repliesid] &&
+                                            <TextField
+                                              placeholder={langText.editcomment}
+                                              aria-label="Username"
+                                              aria-describedby="basic-addon1"
+                                              className="form-control"
+                                              value={this.state.editReplyComment}
+                                              onChange={(e, newValue) => this.onChangeReplyEditComment(e, newValue)}
+                                              onKeyPress={(e) => this.handleKeyPressReplyEditComment(e, commentItem.commentid, replyStage1CommentItem.repliesid)}
+                                            />)}
+                                        </div>
 
-                                      <div className="col-lg-12 mt-3">
-                                        <div className="clearfix">
-                                          {/* <div className="float-start">
+                                        <div className="col-lg-12 mt-3">
+                                          <div className="clearfix">
+                                            {/* <div className="float-start">
                                           <p className="vcs-text-dark me-3 ms-3 float-start mb-0 cursor-pointer">
                                             <img
                                               src={Voteicon}
@@ -2960,50 +2989,57 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
                                             <span className="ms-2">{replyStage1CommentItem.uservotecount}</span>
                                           </p>
                                         </div> */}
-                                          {/* <div className="float-end">
+                                            {/* <div className="float-end">
                         <p className="vcs-text-dark float-start mb-0 cursor-pointer">
                           <span className="ms-2">Reply</span>
                         </p>
                       </div> */}
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))}
-                                {this.state.isReplyCommentShow[commentItem.commentid] && (
-                                  <div className="col-lg-12 input-with-img">
+                                  ))}
+                                  {this.state.isReplyCommentShow[commentItem.commentid] && (
+                                    <div className="col-lg-12 input-with-img">
 
-                                    <div className="mb-3 mt-4 input-group">
-                                      <span className="input-group-text" id="basic-addon1">
-                                      {this.userImageUrl != '' && (
-                        <img
-                          className="profile-img02"
-                          src={this.userImageUrl}
-                          alt="user pic"
-                        />)}
-                      {this.userImageUrl == '' && (
-                        <img
-                          className="profile-img02"
-                          src={DummyProfileimg}
-                          alt="user pic"
-                        />)}
+                                      <div className="mb-3 mt-4 input-group">
+                                        <span className="input-group-text" id="basic-addon1">
+                                          {this.userImageUrl != '' && (
+                                            <img
+                                              className="profile-img02"
+                                              src={this.userImageUrl}
+                                              alt="user pic"
+                                            />)}
+                                          {this.userImageUrl == '' && (
+                                            <img
+                                              className="profile-img02"
+                                              src={DummyProfileimg}
+                                              alt="user pic"
+                                            />)}
 
-                                      </span>
-                                      <TextField
-                                        placeholder={langText.addareply}
-                                        aria-label="Username"
-                                        aria-describedby="basic-addon1"
-                                        className="form-control"
-                                        value={this.state.replyStage1Comment}
-                                        onChange={(e, newValue) =>
-                                          this.onChangeReplyComment(e, newValue)}
-                                        onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid, item.ideaid, item.ideatitle, item.ideaowner)}
-                                      />
-                                    </div>
+                                        </span>
+                                        <TextField
+                                          placeholder={langText.addareply}
+                                          aria-label="Username"
+                                          aria-describedby="basic-addon1"
+                                          className="form-control"
+                                          value={this.state.replyStage1Comment}
+                                          onChange={(e, newValue) =>
+                                            this.onChangeReplyComment(e, newValue)}
+                                          onKeyPress={(e) => this.handleKeyPressReplyComment(e, commentItem.commentid, item.ideaid, item.ideatitle, item.ideaowner)}
+                                        />
+                                        <span className="input-send-comment">
+                                    <img
+                                      className="sentcomment-img"
+                                      src={SentComment}
+                                      alt="SentComment-pic"
+                                    />
+                                  </span>
+                                      </div>
 
-                                  </div>)}
-                                {/* {this.state.isReplyCommentShow[commentItem.commentid] && ( */}
-                                {/* <div className="col-lg-12 input-with-img">
+                                    </div>)}
+                                  {/* {this.state.isReplyCommentShow[commentItem.commentid] && ( */}
+                                  {/* <div className="col-lg-12 input-with-img">
                 <InputGroup className="mb-3 mt-3">
                   <InputGroup.Text id="basic-addon1">
                     <img
@@ -3041,17 +3077,17 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
 
               </div> */}
 
+                                </div>
+                                {/* )} */}
                               </div>
-                              {/* )} */}
-                            </div>
-                          ))}
-                          {/* <!-- "Load More" button --> */}
-                          {this.state.isCommentLoadMore && (
-                            <button className="load-more-comments-btn" onClick={() => this.loadMoreComments(item.ideaid)}>{langText.loadmore}</button>
-                          )}
+                            ))}
+                            {/* <!-- "Load More" button --> */}
+                            {this.state.isCommentLoadMore && (
+                              <button className="load-more-comments-btn" onClick={() => this.loadMoreComments(item.ideaid)}>{langText.loadmore}</button>
+                            )}
 
-                        </div>
-                      )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -3170,7 +3206,7 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
               height="48"
             />
             <DialogFooter>
-              <DefaultButton onClick={this.closeSuccessDialog} text={langText.closed}/>
+              <DefaultButton onClick={this.closeSuccessDialog} text={langText.closed} />
             </DialogFooter>
           </Dialog>
 
@@ -3225,7 +3261,7 @@ const langText = this.state.lang === "en" ? this.state.englishContent:this.state
           Do you want to report this comment?
                   </div> */}
             <DialogFooter>
-              <DefaultButton onClick={() => this.closestage1CommentReportDialog()} text={langText.closed}/>
+              <DefaultButton onClick={() => this.closestage1CommentReportDialog()} text={langText.closed} />
               <DefaultButton onClick={() => this.reportComment()} text={langText.yes} />
 
             </DialogFooter>
