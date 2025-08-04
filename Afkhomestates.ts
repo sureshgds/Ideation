@@ -1,9 +1,10 @@
 export interface IAfkHomeStates {
     isSuccess: any;
     showExtraSpan: any;
+    showexttraReplySpan: any;
     isError: any;
-    isInGroup:any;
-    error:any
+    isInGroup: any;
+    error: any
     isLoader: any;
     isSuccessDialogVisible: any;
     successMessageDesciption: any;
@@ -71,8 +72,8 @@ export interface IAfkHomeStates {
     oldsubmissions: any;
     mostliked: any;
     mostcomments: any;
-    onlyyouractivity:any;
-    Recent:any;
-    bookmarksremoved:any;
+    onlyyouractivity: any;
+    Recent: any;
+    bookmarksremoved: any;
     searchText: any;
 }
