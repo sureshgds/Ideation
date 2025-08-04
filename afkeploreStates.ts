@@ -2,6 +2,7 @@ export interface IAfkExploreStates {
     isSuccess: any;
     isLoader: any;
     showExtraSpan: any;
+    showexttraReplySpan: any;
     isSuccessDialogVisible: any;
     successMessageDesciption: any;
     successMessageTitle: any;
