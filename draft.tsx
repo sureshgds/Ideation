@@ -4,6 +4,7 @@ import type { IAfkDraftsProps } from './IAfkDraftsProps';
 //import { escape } from '@microsoft/sp-lodash-subset';
 //import HomeNewsimg01 from "./../assets/img/hnews01.jpg";
 import Deletetrash from "./../assets/img/svg/draft/delete-trash.png";
+//import MIe01 from "./../assets/img/svg/modal/submitted-thumbs.png";
 import "./../assets/css/afstyle.css";
 import "./../assets/js/bootstrap.bundle.min.js";
 require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
@@ -12,6 +13,12 @@ import { IdeationAPIServices } from '../../../ideationAPIservice/ideationAPI';
 import { IAfkDraftsStates } from './IAfkDraftsStates';
 import * as CryptoJS from 'crypto-js';
 import MIe02 from "./../assets/img/svg/modal/cancel-clipboard.png";
+// import {
+//   DefaultButton,
+//   Dialog,
+//   DialogFooter,
+//   DialogType,
+// } from "@fluentui/react";
 
 export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraftsStates, {}> {
   private IdeationServices: IdeationAPIServices;
@@ -81,6 +88,10 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
       console.error("Error fetching JSON file:", error);
     }
   };
+  closestage1CommentReportDialog = () => {
+    this.setState({ isdraftopopup: false })
+  }
+
 
   changeLanguage() {
     const body = document.body;
@@ -600,7 +611,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
         this.myideas();
       } else {
         console.error("Failed to delete draft:", response?.data?.message || "Unknown error");
-        this.setState({ isLoader: false ,isdraftopopup: false});
+        this.setState({ isLoader: false, isdraftopopup: false });
       }
     } catch (error) {
       console.error("Delete Draft Error:", error);
@@ -650,12 +661,19 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
                               className="hnews-img"
                             />
                           ))}
-
-
-                          <div className="position-absolute top-0 end-0 mt-2 me-3">
+                          <div className="position-absolute top-0 end-0 mt-2 me-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteDraftModal"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              this.deleteDraftConfirm(item.ideaid); // call delete
+                            }}
+                          >
                             <button
                               type="button"
                               className="btn btn-link p-0 m-0"
+                              data-bs-toggle="modal"
+                              data-bs-target="#deleteDraftModal"
                               style={{ boxShadow: "none" }}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -681,8 +699,29 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
             </div>
           ))}
         </div>
-        {this.state.isdraftopopup && (
 
+        {/* <Dialog
+            hidden={!this.state.isdraftopopup}
+            onDismiss={this.closestage1CommentReportDialog}
+            dialogContentProps={{
+              type: DialogType.normal,
+              title: "Delete Draft",
+              className: 'ebtdialogsmallic'
+            }}
+          >
+            <img
+              src={MIe01}
+              className="mis-icon ebtdialogicon"
+              alt="edit-icon"
+              width="48"
+              height="48"
+            />
+            <DialogFooter>
+              <DefaultButton className="btn-clear" onClick={() => this.closestage1CommentReportDialog()} text={langText.cancel} />
+              <DefaultButton className="btn-approve" onClick={() =>  this.deleteDraft(this.state.myideaid)} text={langText.delete} />
+            </DialogFooter>
+          </Dialog> */}
+  
           <div
             className="modal fade"
             id="deleteDraftModal"
@@ -745,7 +784,7 @@ export default class AfkDrafts extends React.Component<IAfkDraftsProps, IAfkDraf
             </div>
           </div>
 
-        )}
+        
       </div>
     );
   }
